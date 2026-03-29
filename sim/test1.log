@@ -1,0 +1,135 @@
+# vsim -cvgperinstance -vopt -voptargs="+acc" -coverage -sva -c -do " log -r /* ;coverage save -onexit mem_cov1;run -all; exit" -wlf wave_file1.wlf -l test1.log -sv_seed random work.top "+UVM_TESTNAME=test" 
+# Start time: 22:59:20 on Mar 29,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt2
+# //  Questa Sim-64
+# //  Version 2022.1_2 linux_x86_64 Apr  2 2022
+# //
+# //  Copyright 1991-2022 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.uart_if(fast)
+# Loading mtiUvm.uvm_pkg(fast)
+# Loading work.pkg(fast)
+# Loading mtiUvm.questa_uvm_pkg(fast)
+# Loading work.top(fast)
+# Loading work.uart_if(fast__2)
+# Loading work.uart_16550(fast)
+# Loading work.uart_register_file(fast)
+# Loading work.uart_tx(fast)
+# Loading work.uart_fifo(fast)
+# Loading work.uart_rx(fast)
+# Loading /home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/linux_x86_64/uvm_dpi.so
+# ** Warning: (vsim-8634) Code was not compiled with coverage options.
+# Sv_Seed = 2768085601
+#  log -r /* 
+# coverage save -onexit mem_cov1
+# run -all
+# ----------------------------------------------------------------
+# UVM-1.1d
+# (C) 2007-2013 Mentor Graphics Corporation
+# (C) 2007-2013 Cadence Design Systems, Inc.
+# (C) 2006-2013 Synopsys, Inc.
+# (C) 2011-2013 Cypress Semiconductor Corp.
+# ----------------------------------------------------------------
+# 
+#   ***********       IMPORTANT RELEASE NOTES         ************
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_NO_DEPRECATED undefined.
+#   See http://www.eda.org/svdb/view.php?id=3313 for more details.
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_OBJECT_MUST_HAVE_CONSTRUCTOR undefined.
+#   See http://www.eda.org/svdb/view.php?id=3770 for more details.
+# 
+#       (Specify +UVM_NO_RELNOTES to turn off this notice)
+# 
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(277) @ 0: reporter [Questa UVM] QUESTA_UVM-1.2.3
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(278) @ 0: reporter [Questa UVM]  questa_uvm::init(+struct)
+# UVM_INFO @ 0: reporter [RNTST] Running test test...
+# UVM_INFO @ 0: reporter [UVMTOP] UVM testbench topology:
+# --------------------------------------------------------------------
+# Name                         Type                        Size  Value
+# --------------------------------------------------------------------
+# sb_fifo_0                    uvm_tlm_analysis_fifo #(T)  -     @513 
+#   analysis_export            uvm_analysis_imp            -     @552 
+#   get_ap                     uvm_analysis_port           -     @544 
+#   get_peek_export            uvm_get_peek_imp            -     @528 
+#   put_ap                     uvm_analysis_port           -     @536 
+#   put_export                 uvm_put_imp                 -     @520 
+# sb_fifo_1                    uvm_tlm_analysis_fifo #(T)  -     @560 
+#   analysis_export            uvm_analysis_imp            -     @599 
+#   get_ap                     uvm_analysis_port           -     @591 
+#   get_peek_export            uvm_get_peek_imp            -     @575 
+#   put_ap                     uvm_analysis_port           -     @583 
+#   put_export                 uvm_put_imp                 -     @567 
+# uvm_test_top                 test                        -     @475 
+#   envh                       env                         -     @491 
+#     agt_top                  agent_top                   -     @499 
+#       agth[0]                agent                       -     @608 
+#         drvh                 driver                      -     @645 
+#           rsp_port           uvm_analysis_port           -     @660 
+#           seq_item_port      uvm_seq_item_pull_port      -     @652 
+#         monh                 monitor                     -     @630 
+#           mon_ap             uvm_analysis_port           -     @637 
+#         seqrh                sequencer                   -     @668 
+#           rsp_export         uvm_analysis_export         -     @675 
+#           seq_item_export    uvm_seq_item_pull_imp       -     @769 
+#           arbitration_queue  array                       0     -    
+#           lock_queue         array                       0     -    
+#           num_last_reqs      integral                    32    'd1  
+#           num_last_rsps      integral                    32    'd1  
+#       agth[1]                agent                       -     @620 
+#         drvh                 driver                      -     @804 
+#           rsp_port           uvm_analysis_port           -     @819 
+#           seq_item_port      uvm_seq_item_pull_port      -     @811 
+#         monh                 monitor                     -     @789 
+#           mon_ap             uvm_analysis_port           -     @796 
+#         seqrh                sequencer                   -     @827 
+#           rsp_export         uvm_analysis_export         -     @834 
+#           seq_item_export    uvm_seq_item_pull_imp       -     @928 
+#           arbitration_queue  array                       0     -    
+#           lock_queue         array                       0     -    
+#           num_last_reqs      integral                    32    'd1  
+#           num_last_rsps      integral                    32    'd1  
+#     sbh                      sb                          -     @506 
+# --------------------------------------------------------------------
+# 
+# uart1 THR size :           0
+# uart2 RBR size :           0
+# uart2 THR size :           0
+# uart1 RBR size :           0
+# uart1 THR : '{}
+# uart2 RBR : '{}
+# uart2 THR : '{}
+# uart1 RBR : '{}
+# IIR xtn 1 --------------  0000
+# IIR xtn 2--------------  0000
+# LSR xtn 1---------------00000000
+# LSR xtn 2---------------00000000
+# 
+# --- UVM Report Summary ---
+# 
+# ** Report counts by severity
+# UVM_INFO :    4
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    0
+# ** Report counts by id
+# [Questa UVM]     2
+# [RNTST]     1
+# [UVMTOP]     1
+# ** Note: $finish    : /home/cad/eda/Mentor_Graphics/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh(430)
+#    Time: 0 ns  Iteration: 216  Instance: /top
+# Saving coverage database on exit...
+# End time: 22:59:21 on Mar 29,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 1

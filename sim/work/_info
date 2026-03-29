@@ -1,0 +1,291 @@
+m255
+K4
+z2
+Z0 !s99 nomlopt
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+!s11f vlog 2022.1_2 2022.04, Apr  2 2022
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z1 d/home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/UVM_LABS/uart_final_project/sim
+T_opt
+Z2 !s11d pkg /home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/UVM_LABS/uart_final_project/sim/work 1 uart_if 1 /home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/UVM_LABS/uart_final_project/sim/work 
+!s110 1773046904
+VnHDdL1Yb_]Jz:X09DI`fH2
+Z3 04 3 4 work top fast 0
+=1-208810b9d0a7-69ae8c77-e6243-3d8f6
+R0
+Z4 !s124 OEM100
+Z5 o-quiet -auto_acc_if_foreign -work work +acc
+Z6 tCvgOpt 0
+n@_opt
+Z7 OL;O;2022.1_2;75
+R1
+T_opt1
+R2
+!s110 1773046528
+V84l0R[V:RPo:=a@<HNDNQ1
+R3
+=1-208810b9d0a7-69ae8aff-5a9ff-326e4
+R0
+R4
+o-quiet -auto_acc_if_foreign -work work
+R6
+n@_opt1
+R7
+R1
+T_opt2
+!s11d pkg /home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/Internship_proj/uart_final_project/sim/work 1 uart_if 1 /home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/Internship_proj/uart_final_project/sim/work 
+!s110 1773052920
+Vh]:U7B1[DZ>hTLK=4iL1N1
+R3
+=1-208810b9d0a7-69aea3f7-d1ff3-d0474
+R0
+R4
+R5
+R6
+n@_opt2
+R7
+R1
+Xpkg
+!s115 uart_if
+Z8 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z9 DXx6 mtiUvm 7 uvm_pkg 0 22 8V[`8]Q0W57le7Z>zYaAj1
+Z10 !s110 1774805360
+!i10b 1
+!s100 WN;?h`Ig[0F0zN4@WQ=Dj0
+IHNVYFY1VMH=G9PSXeH<hC0
+S1
+Z11 d/home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/Internship_proj/uart_final_project/sim
+Z12 w1773052879
+8../test/pkg.sv
+F../test/pkg.sv
+Z13 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh
+Z14 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh
+Z15 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh
+Z16 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh
+Z17 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh
+Z18 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh
+Z19 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh
+Z20 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh
+Z21 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh
+Z22 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh
+Z23 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh
+Z24 F/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh
+F../agent/agent_config.sv
+F../tb/env_config.sv
+F../agent/xtn.sv
+F../agent/seqs.sv
+F../agent/driver.sv
+F../agent/monitor.sv
+F../agent/sequencer.sv
+F../agent/agent.sv
+F../agent/agent_top.sv
+F../tb/sb.sv
+F../tb/env.sv
+F../test/test.sv
+!i122 51
+Z25 L0 1 0
+VHNVYFY1VMH=G9PSXeH<hC0
+Z26 OL;L;2022.1_2;75
+r1
+!s85 0
+31
+Z27 !s108 1774805359.000000
+!s107 ../test/test.sv|../tb/env.sv|../tb/sb.sv|../agent/agent_top.sv|../agent/agent.sv|../agent/sequencer.sv|../agent/monitor.sv|../agent/driver.sv|../agent/seqs.sv|../agent/xtn.sv|../tb/env_config.sv|../agent/agent_config.sv|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh|../tb/top.sv|../test/pkg.sv|../uart_rtl/uart_tx.v|../uart_rtl/uart_rx.v|../uart_rtl/uart_register_file.v|../uart_rtl/uart_if.sv|../uart_rtl/uart_fifo.v|../uart_rtl/uart_16550.v|
+Z28 !s90 -work|work|../uart_rtl/uart_16550.v|../uart_rtl/uart_fifo.v|../uart_rtl/uart_if.sv|../uart_rtl/uart_register_file.v|../uart_rtl/uart_rx.v|../uart_rtl/uart_tx.v|+incdir+../tb|+incdir+../test|+incdir+../agent|../test/pkg.sv|../tb/top.sv|
+!i113 0
+Z29 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z30 !s92 -work work +incdir+../tb +incdir+../test +incdir+../agent -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R6
+vtop
+R8
+R9
+DXx4 work 3 pkg 0 22 HNVYFY1VMH=G9PSXeH<hC0
+R10
+!i10b 1
+!s100 Uk0T7;`4:HFllJfJYS]1g1
+Ia7eZQSe`[L<B0@2=j0a>Y0
+S1
+R11
+R12
+8../tb/top.sv
+F../tb/top.sv
+R13
+R14
+R15
+R16
+R17
+R18
+R19
+R20
+R21
+R22
+R23
+R24
+!i122 51
+L0 1 6536
+Z31 VDg1SIo80bB@j0V0VzS_@n1
+R26
+r1
+!s85 0
+31
+R27
+Z32 !s107 ../test/test.sv|../tb/env.sv|../tb/sb.sv|../agent/agent_top.sv|../agent/agent.sv|../agent/sequencer.sv|../agent/monitor.sv|../agent/driver.sv|../agent/seqs.sv|../agent/xtn.sv|../tb/env_config.sv|../agent/agent_config.sv|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_deprecated_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_reg_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_callback_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_sequence_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/tlm1/uvm_tlm_imps.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_tlm_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_printer_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_object_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_phase_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_message_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/macros/uvm_version_defines.svh|/home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src/uvm_macros.svh|../tb/top.sv|../test/pkg.sv|../uart_rtl/uart_tx.v|../uart_rtl/uart_rx.v|../uart_rtl/uart_register_file.v|../uart_rtl/uart_if.sv|../uart_rtl/uart_fifo.v|../uart_rtl/uart_16550.v|
+R28
+!i113 0
+R29
+R30
+R6
+vuart_16550
+Z33 !s110 1774805359
+!i10b 1
+!s100 m>mNTEFI2nZPB>Ng^QMC62
+ID;FP0>S_DO5><LJBc0ZG43
+R11
+R12
+8../uart_rtl/uart_16550.v
+F../uart_rtl/uart_16550.v
+!i122 51
+L0 26 129
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6
+vuart_fifo
+R33
+!i10b 1
+!s100 BP`_mAHk:TIe^A>LYkEY:2
+IoYGb6]L@QFYQQj1mK4Afc3
+R11
+R12
+8../uart_rtl/uart_fifo.v
+F../uart_rtl/uart_fifo.v
+!i122 51
+L0 23 71
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6
+Yuart_if
+R8
+R33
+!i10b 1
+!s100 :HNN1gnNH6YR?mX_S;B=@1
+IL;]SaHTkYTeo3>_Q^dG]A0
+S1
+R11
+R12
+8../uart_rtl/uart_if.sv
+F../uart_rtl/uart_if.sv
+!i122 51
+R25
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6
+vuart_register_file
+R33
+!i10b 1
+!s100 9JgB]:4;7K?R05?b5z4zY3
+ITcZCU23Z=MGn>fAR9ndcM2
+R11
+R12
+8../uart_rtl/uart_register_file.v
+F../uart_rtl/uart_register_file.v
+!i122 51
+L0 25 445
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6
+vuart_rx
+R33
+!i10b 1
+!s100 R]9;ZT4Fbd9iBHSWPEZB]2
+I[D3G<V5fG5lf22Z^]9AgB3
+R11
+R12
+8../uart_rtl/uart_rx.v
+F../uart_rtl/uart_rx.v
+!i122 51
+L0 23 360
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6
+vuart_tx
+R33
+!i10b 1
+!s100 _lh1LjPU`9lCJ09gA@n1K1
+I[Bnc;VQDi3bH=cE=:FCHJ3
+R11
+R12
+8../uart_rtl/uart_tx.v
+F../uart_rtl/uart_tx.v
+!i122 51
+L0 26 297
+R31
+R26
+r1
+!s85 0
+31
+R27
+R32
+R28
+!i113 0
+R29
+R30
+R6

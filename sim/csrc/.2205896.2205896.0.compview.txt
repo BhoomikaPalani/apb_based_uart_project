@@ -1,0 +1,9 @@
+{"vcs1":{"timestamp_begin":1756889185.846118057, "rt":11.29, "ut":11.64, "st":0.31}}
+{"vcselab":{"timestamp_begin":1756889197.190821832, "rt":0.28, "ut":0.21, "st":0.06}}
+{"link":{"timestamp_begin":1756889197.513639206, "rt":0.69, "ut":0.56, "st":0.15}}
+{"SNPS_VCS_INTERNAL_ROOT_START_TIME": 1756889185.332082011}
+{"VCS_COMP_START_TIME": 1756889185.332082011}
+{"VCS_COMP_END_TIME": 1756900130.601574367}
+{"VCS_USER_OPTIONS": "-l vcs.log -timescale=1ns/1ps -sverilog -ntb_opts uvm -debug_access+all -full64 -kdb -lca -P /home/cad/eda/SYNOPSYS/VERDI_2022/verdi/T-2022.06-SP1/share/PLI/VCS/LINUX64/novas.tab /home/cad/eda/SYNOPSYS/VERDI_2022/verdi/T-2022.06-SP1/share/PLI/VCS/LINUX64/pli.a ../uart_rtl/uart_16550.v ../uart_rtl/uart_fifo.v ../uart_rtl/uart_if.sv ../uart_rtl/uart_register_file.v ../uart_rtl/uart_rx.v ../uart_rtl/uart_tx.v +incdir+../tb +incdir+../test +incdir+../agent ../test/pkg.sv ../tb/top.sv"}
+{"vcs1": {"peak_mem": 2206806}}
+{"stitch_vcselab": {"peak_mem": 2208163}}

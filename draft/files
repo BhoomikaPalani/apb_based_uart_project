@@ -1,0 +1,3163 @@
+// driver class         
+
+class driver extends uvm_driver#(xtn);
+
+	`uvm_component_utils(driver)
+
+	virtual uart_if.DRV_MP vif;
+
+	agent_config agt_cfg;
+	
+	function new(string name="driver",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		if(!uvm_config_db#(agent_config)::get(this,"","agent_config",agt_cfg))
+			`uvm_fatal("DRIVER","get() failed for agt_cfg");
+	endfunction
+
+	function void connect_phase(uvm_phase phase);
+		vif=agt_cfg.vif;
+		$display("================================================================= %0p",vif);
+	endfunction
+
+	task run_phase(uvm_phase phase);
+
+	@(vif.drv_cb);
+	vif.drv_cb.Presetn<=1'b0;
+	@(vif.drv_cb);
+	vif.drv_cb.Presetn<=1'b1;
+
+		forever
+			begin
+				seq_item_port.get_next_item(req);
+				send_to_dut(req);
+				seq_item_port.item_done();
+				//req.print();
+
+			end
+	endtask
+
+	task send_to_dut(xtn req);
+		//`uvm_info("DRIVER","DATA FROM DRIVER",UVM_LOW);
+			
+	@(vif.drv_cb);
+	vif.drv_cb.Paddr<=req.paddr;
+	vif.drv_cb.Pwdata<=req.pwdata;
+	vif.drv_cb.Pwrite<=req.pwrite;
+	vif.drv_cb.Psel<=1'b1;
+	vif.drv_cb.Penable<=1'b0;
+	@(vif.drv_cb);
+	vif.drv_cb.Penable<=1'b1;
+	//$display("aaaaaaaaaaaaaaa");
+	while(!vif.drv_cb.Pready)
+		@(vif.drv_cb);
+	if(req.paddr==32'h8 && req.pwrite==0)
+		begin
+	//$display("aaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbba");
+		//	wait(vif.drv_cb.IRQ==1)
+
+			while(vif.drv_cb.IRQ!==1)
+				@(vif.drv_cb);
+	//$display("aaaaaaaaaaaaaaccccffgggggggggggggggggga");
+
+			req.IIR=vif.drv_cb.Prdata;
+	$display("#########################################################");
+			seq_item_port.put_response(req);
+		end
+		`uvm_info("DRIVER",$sformatf("DATA FROM DRIVER \n %s",req.sprint()),UVM_LOW);
+
+	endtask
+
+
+
+endclass
+
+
+
+
+
+
+//   monitor logic
+
+class monitor extends uvm_monitor;
+
+	`uvm_component_utils(monitor)
+	
+	function new(string name="monitor",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	virtual uart_if.MON_MP vif;
+
+	agent_config agt_cfg;
+	
+	function void build_phase(uvm_phase phase);
+		if(!uvm_config_db#(agent_config)::get(this,"","agent_config",agt_cfg))
+			`uvm_fatal("MONITOR","get() failed for agt_cfg");
+			
+	endfunction
+
+	function void connect_phase(uvm_phase phase);
+		vif=agt_cfg.vif;
+	endfunction
+
+	task run_phase(uvm_phase phase);
+		
+		forever
+			collect_data();
+	endtask
+
+	task collect_data();
+	xtn xtns;
+	xtns=xtn::type_id::create("xtns");
+
+		@(vif.mon_cb);
+		while(vif.mon_cb.Psel!==1)
+			@(vif.mon_cb);
+		//begin
+			while(vif.mon_cb.Pready!==1)
+				@(vif.mon_cb);
+			xtns.presetn=vif.mon_cb.Presetn;
+			xtns.paddr=vif.mon_cb.Paddr;
+			xtns.pwdata=vif.mon_cb.Pwdata;
+			xtns.pwrite=vif.mon_cb.Pwrite;
+			xtns.prdata=vif.mon_cb.Prdata;
+			xtns.pslaverr=vif.mon_cb.Pslverr;
+			xtns.psel=vif.mon_cb.Psel;
+			xtns.penable=vif.mon_cb.Penable;
+			xtns.IRQ=vif.mon_cb.IRQ;
+			@(vif.mon_cb);
+
+		//update THR
+		if(xtns.paddr==32'h0 && xtns.pwrite==1'b1)
+			begin
+				xtns.data_in_thr=1'b1;
+				xtns.THR.push_back(xtns.pwdata);
+			end
+		
+		//update RBR
+		if(xtns.paddr==32'h0 && xtns.pwrite==1'b0)
+			begin
+				xtns.data_in_rbr=1'b1;
+				xtns.RBR.push_back(xtns.pwdata);
+			end
+
+		//update LCR 
+		if(xtns.paddr==32'hc && xtns.pwrite==1'b1)
+			xtns.LCR=xtns.pwdata;
+
+
+		//update FCR
+		if(xtns.paddr==32'h8 && xtns.pwrite==1'b1)
+			xtns.FCR=xtns.pwdata;
+		
+		//update IER
+		if(xtns.paddr==32'h04 && xtns.pwrite==1'b1)
+			xtns.IER=xtns.pwdata;
+		
+		//update DIVISOR LSB 
+		if(xtns.paddr==32'h1c && xtns.pwrite==1'b1)
+			begin
+			xtns.DIV2[7:0]=xtns.pwdata;
+			xtns.d2_access=1'b1;
+			end
+	
+		//update DIVISOR MSB 
+		if(xtns.paddr==32'h20 && xtns.pwrite==1'b1)
+			begin
+			xtns.DIV1[7:0]=xtns.pwdata;
+			xtns.d1_access=1'b1;
+			end
+
+
+	//end
+		`uvm_info("MONITOR",$sformatf("DATA FROM MONITOR \n %s",xtns.sprint()),UVM_LOW);
+
+	endtask
+
+	
+endclass
+
+
+
+//    sequences class
+
+class seq extends uvm_sequence#(xtn);
+
+	`uvm_object_utils(seq)
+
+	function new(string name="seq");
+		super.new(name);
+	endfunction
+
+endclass
+
+class full_duplex_seq1 extends seq;
+
+	`uvm_object_utils(full_duplex_seq1)
+
+	function new(string name="full_duplex_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+		req=xtn::type_id::create("req");
+		
+		//DIV MSB
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h20;pwdata==32'h00;});
+		finish_item(req);
+
+		//DIV LSB
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h1c;pwdata==27;});
+		finish_item(req);
+
+		//LCR - NORMAL MODE
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'hc;pwdata==8'b00000011;});
+		finish_item(req);
+
+		//FCR 
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h8;pwdata==8'b00000110;});
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h4;pwdata==8'b00000101;});
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h00;pwdata==16;});
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {pwrite==0;paddr==32'h08;})
+		finish_item(req);
+		get_response(req);
+
+		if(req.IIR[3:0]==4)
+			begin
+				start_item(req);
+				assert(req.randomize() with {pwrite==0;paddr==32'h00;})
+				finish_item(req);
+			end
+		if(req.IIR[3:0]==6)
+			begin
+				start_item(req);
+				assert(req.randomize() with {pwrite==0;paddr==32'h14;})
+				finish_item(req);
+			end
+
+				
+
+	endtask
+endclass
+
+
+class full_duplex_seq2 extends seq;
+
+	`uvm_object_utils(full_duplex_seq2)
+
+	function new(string name="full_duplex_seq2");
+		super.new(name);
+	endfunction
+
+	task body();
+		req=xtn::type_id::create("req");
+		
+		//DIV MSB
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h20;pwdata==8'd00;});
+		finish_item(req);
+
+		//DIV LSB
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h1c;pwdata==8'd54;});
+		finish_item(req);
+
+		//LCR - NORMAL MODE
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'hc;pwdata==8'b00000011;});
+		finish_item(req);
+
+		//FCR 
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h8;pwdata==8'b00000110;});
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h4;pwdata==8'b00000101;});
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {pwrite==1;paddr==32'h00;pwdata==20;});
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {pwrite==0;paddr==32'h08;});
+		finish_item(req);
+		get_response(req);
+
+
+		if(req.IIR[3:0]==4)
+			begin
+				start_item(req);
+				assert(req.randomize() with {pwrite==0;paddr==32'h00;});
+				finish_item(req);
+			end
+		if(req.IIR[3:0]==6)
+			begin
+				start_item(req);
+				assert(req.randomize() with {pwrite==0;paddr==32'h14;});
+				finish_item(req);
+			end
+
+
+		endtask
+endclass
+
+
+//  transcation class
+
+
+class xtn extends uvm_sequence_item;
+
+	`uvm_object_utils(xtn)
+
+	function new(string name="xtn");
+		super.new(name);
+	endfunction
+
+	//bit pclk;
+	bit presetn;
+	rand bit[31:0] paddr;
+	bit psel;
+	rand bit pwrite;
+	bit penable;
+	rand bit[31:0] pwdata;
+	bit[31:0] prdata;
+	bit pready;
+	bit pslaverr;
+
+	bit data_in_thr;
+	bit data_in_rbr;
+
+	bit d1_access;
+	bit d2_access;
+
+	
+	bit[7:0] THR[$];
+	bit[7:0] RBR[$];
+	bit[7:0] FCR;
+	bit[7:0] LCR;
+	bit[7:0] DIV1;
+	bit[7:0] DIV2;
+	bit[7:0] IER;
+	bit[7:0] MSR;
+	bit[7:0] IIR;
+	bit[7:0] IRQ;
+
+	function void do_print(uvm_printer printer);
+	
+		
+		printer.print_field("presetn",this.presetn,1,UVM_DEC);
+		printer.print_field("paddr",this.paddr,32,UVM_HEX);
+		printer.print_field("pwdata",this.pwdata,32,UVM_DEC);
+		printer.print_field("prdata",this.prdata,32,UVM_DEC);
+		printer.print_field("psel",this.psel,1,UVM_DEC);
+		printer.print_field("pwrite",this.pwrite,1,UVM_DEC);
+		printer.print_field("penable",this.penable,1,UVM_DEC);
+		printer.print_field("pready",this.pready,1,UVM_DEC);
+		printer.print_field("pslaverr",this.pslaverr,1,UVM_DEC);
+
+		printer.print_field("FCR",this.FCR,8,UVM_DEC);
+		printer.print_field("LCR",this.LCR,8,UVM_DEC);
+		printer.print_field("DIV1",this.DIV1,8,UVM_DEC);
+		printer.print_field("DIV2",this.DIV2,8,UVM_DEC);
+		printer.print_field("IER",this.IER,8,UVM_DEC);
+		printer.print_field("MSR",this.MSR,8,UVM_DEC);
+		printer.print_field("IIR",this.IIR,8,UVM_BIN);
+		printer.print_field("IRQ",this.IRQ,8,UVM_DEC);
+
+		foreach(THR[i])
+				printer.print_field($sformatf("THR[%0d]",i),this.THR[i],$bits(bit),UVM_DEC);
+		foreach(RBR[i])
+				printer.print_field($sformatf("RBR[%0d]",i),this.RBR[i],$bits(bit),UVM_DEC);
+
+		printer.print_field("data_in_thr",this.data_in_thr,1,UVM_DEC);
+		printer.print_field("data_in_rbr",this.data_in_rbr,1,UVM_DEC);
+		printer.print_field("d1_access",this.d1_access,1,UVM_DEC);
+		printer.print_field("d2_access",this.d2_access,1,UVM_DEC);
+	
+
+
+
+	endfunction
+
+
+
+
+	
+
+endclass
+
+
+
+//   test class
+
+class test extends uvm_test;
+
+	`uvm_component_utils(test)
+	
+	function new(string name="test",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	env envh;
+
+	env_config env_cfg;
+	agent_config agt_cfg[];
+	
+	int no_of_agents=2;
+
+	function void build_phase(uvm_phase phase);
+		env_cfg=env_config::type_id::create("env_cfg");
+env_cfg.agt_cfg=new[no_of_agents];
+
+		agt_cfg=new[no_of_agents];
+	
+		foreach(agt_cfg[i])
+			begin
+				agt_cfg[i]=agent_config::type_id::create($sformatf("agt_cfg[%0d]",i));
+				if(!uvm_config_db#(virtual uart_if)::get(this,"",$sformatf("if%0d",i),agt_cfg[i].vif))
+					`uvm_fatal("TEST","get() failed virtual interface");
+				agt_cfg[i].is_active=UVM_ACTIVE;
+		env_cfg.agt_cfg[i]=agt_cfg[i];
+	
+			end
+
+	
+		env_cfg.no_of_agents=no_of_agents;
+
+
+		uvm_config_db#(env_config)::set(this,"*","env_config",env_cfg);
+		
+		envh=env::type_id::create("envh",this);
+		
+	endfunction
+
+	function void end_of_elaboration_phase(uvm_phase phase);
+		uvm_top.print_topology();
+	endfunction
+	
+endclass
+
+class full_duplex_test extends test;
+
+	`uvm_component_utils(full_duplex_test)
+
+	function new(string name="full_duplex_test",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	full_duplex_seq1 seq1;
+	full_duplex_seq2 seq2;
+
+	task run_phase(uvm_phase phase);
+
+		seq1=full_duplex_seq1::type_id::create("seq1");
+		seq2=full_duplex_seq2::type_id::create("seq2");
+
+		phase.raise_objection(this);
+		fork
+			/*begin
+				seq1.start(envh.agt_top.agth[0].seqrh);
+			end
+
+			begin
+				seq2.start(envh.agt_top.agth[1].seqrh);
+			end*/
+			seq1.start(envh.agt_top.agth[0].seqrh);
+			seq2.start(envh.agt_top.agth[1].seqrh);
+
+
+		join
+		#5000;
+		phase.drop_objection(this);
+	endtask
+endclass
+
+//*********************************************************************************************************
+
+class wr_xtn extends uvm_sequence_item;
+
+	`uvm_object_utils(wr_xtn)
+
+	function new(string name="wr_xtn");
+		super.new(name);
+	endfunction
+	
+	//APB SIGNALS
+	     bit 	Presetn;
+	rand bit [31:0] Paddr;
+	     bit	Psel;
+	rand bit 	Pwrite;
+	     bit 	Penable;
+	rand bit [31:0] Pwdata;
+	     bit [31:0] Prdata;
+	     bit	Pready;
+	     bit 	Pslverr;
+       	     bit 	IRQ;
+
+
+    bit [7:0] RBR [$];
+    bit [7:0] THR [$];
+	static bit [7:0] IER;
+	static bit [7:0] IIR;
+	static bit [7:0] FCR;
+	static bit [7:0] LCR;
+	static bit [7:0] LSR;
+	static bit [7:0] MCR;
+	static bit [7:0] MSR;
+	static bit [15:0] divisor;
+
+	static bit dl_access;
+	static bit data_in_thr;
+	static bit data_in_rbr;
+
+	function void do_print(uvm_printer printer);
+		super.do_print(printer);
+		printer.print_field("Preset",	   this.Presetn, 	$bits(Presetn),		UVM_DEC);
+		printer.print_field("Paddr",	   this.Paddr,		$bits(Paddr),		UVM_DEC);
+		printer.print_field("Psel",	   this.Psel,		$bits(Psel),		UVM_DEC);
+		printer.print_field("Pwrite",	   this.Pwrite,		$bits(Pwrite),		UVM_DEC);
+		printer.print_field("Penable",	   this.Penable,	$bits(Penable),		UVM_DEC);
+		printer.print_field("Pwdata",	   this.Pwdata,		$bits(Pwdata),		UVM_DEC);
+		printer.print_field("Prdata",	   this.Prdata,		$bits(Prdata),		UVM_DEC);
+		printer.print_field("Pslverr",     this.Pslverr,	$bits(Pslverr),		UVM_DEC);
+		printer.print_field("IRQ",	   this.IRQ,		$bits(IRQ),		UVM_BIN);
+		printer.print_field("IIR[3:0]",	   this.IIR[3:0],	$bits(IIR),		UVM_HEX);
+		printer.print_field("IER",	   this.IER,		$bits(IER),		UVM_DEC);
+		printer.print_field("FCR",	   this.FCR,		$bits(FCR),		UVM_DEC);
+		printer.print_field("LCR",	   this.LCR,		$bits(LCR),		UVM_DEC);
+		printer.print_field("LSR",	   this.LSR,		$bits(LSR),		UVM_DEC);
+		printer.print_field("MCR",	   this.MCR,		$bits(MCR),		UVM_DEC);
+		printer.print_field("MSR",	   this.MSR,		$bits(MSR),		UVM_DEC);
+		printer.print_field("divisor",	   this.divisor,	$bits(divisor),		UVM_DEC);
+		printer.print_field("dl_access",   this.dl_access,	$bits(dl_access),	UVM_DEC);
+		printer.print_field("data_in_thr", this.data_in_thr,    $bits(data_in_thr), 	UVM_DEC);
+		printer.print_field("data_in_rbr", this.data_in_rbr,    $bits(data_in_rbr), 	UVM_DEC);
+
+
+
+		
+
+		foreach(RBR[i])
+			begin
+				printer.print_field($sformatf("RBR[%0d]",i),	this.RBR[i],	$bits(RBR[i]),	UVM_DEC);
+			end
+	
+		foreach(THR[i])
+			begin
+				printer.print_field($sformatf("THR[%0d]",i),	this.THR[i],	$bits(THR[i]),	UVM_DEC);
+			end
+	endfunction
+
+endclass
+
+//*******************************************
+
+class wr_driver extends uvm_driver#(wr_xtn);
+
+	`uvm_component_utils(wr_driver)
+
+	wr_config w_cfg;
+	
+	virtual uart_if.DRV_MP vif;
+
+	function new(string name="wr_driver",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		if(!uvm_config_db #(wr_config)::get(this,"","wr_config",w_cfg))
+			`uvm_fatal("WR_DRIVER","cannot get config class have you set it?");
+	endfunction
+	
+	function void connect_phase(uvm_phase phase);
+		vif = w_cfg.vif;
+		$display("DRIVER %p",vif);
+	endfunction
+
+	task run_phase(uvm_phase phase);
+	reset;
+
+	forever
+		begin
+
+			seq_item_port.get_next_item(req);
+			drive(req);
+			seq_item_port.item_done();
+		end
+	endtask
+
+	task drive(wr_xtn xtn);
+	//	`uvm_info("DRIVER","Printing from DRIVER",UVM_LOW);
+	//	xtn.print();
+		@(vif.drv_cb);
+//	$display("##################################11111111111111111111111111111#######################");
+
+		vif.drv_cb.Paddr  <= xtn.Paddr;
+		vif.drv_cb.Pwdata <= xtn.Pwdata;
+		vif.drv_cb.Pwrite <= xtn.Pwrite;
+		vif.drv_cb.Psel   <= 1'b1;
+		vif.drv_cb.Penable<= 1'b0;
+//	$display("##################################222222222222222222222222222222222#######################");
+
+		@(vif.drv_cb);
+			vif.drv_cb.Penable <= 1'b1;
+//	$display("##################################33333333333333333333333333333333#######################");
+
+		while(vif.drv_cb.Pready !==1)
+			@(vif.drv_cb);
+//	$display("##################################444444444444444444444444444444444#######################");
+	
+		if(xtn.Paddr == 32'h8 && xtn.Pwrite == 0)
+			begin 
+			//	$display("##################################5555555555555555555555555555555555555#######################");
+
+				while(vif.drv_cb.IRQ !== 1)
+					@(vif.drv_cb);
+			//	$display("##################################666666666666666666666666666666666666666#######################");
+
+				xtn.IIR = vif.drv_cb.Prdata;
+				seq_item_port.put_response(xtn);
+			end				
+	endtask
+	
+	task reset;
+		@(vif.drv_cb);
+		vif.drv_cb.Presetn <= 1'b0;
+		@(vif.drv_cb);
+		vif.drv_cb.Presetn <= 1'b1;
+	endtask
+		
+
+endclass
+
+
+//
+*********************************************88
+
+class wr_monitor extends uvm_monitor;
+
+	`uvm_component_utils(wr_monitor)
+
+	wr_config w_cfg;
+	wr_xtn xtn;
+
+	virtual uart_if.MON_MP vif;
+	
+	uvm_analysis_port #(wr_xtn) mon_ap;
+
+	function new(string name="wr_monitor",uvm_component parent);
+		super.new(name,parent);
+		mon_ap = new("mon_ap",this);
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		xtn = wr_xtn::type_id::create("xtn");
+		if(!uvm_config_db #(wr_config)::get(this,"","wr_config",w_cfg))
+			`uvm_fatal("WR_MONITOR","cannot get config class have you set it?");
+		
+	endfunction
+
+	function void connect_phase(uvm_phase phase);
+		vif = w_cfg.vif;
+		$display("MONITOR %p",vif);
+	endfunction
+	
+	task run_phase(uvm_phase phase);
+		forever
+			begin 
+				//xtn = wr_xtn::type_id::create("xtn");
+				collect_data(xtn);
+			end
+	endtask
+
+	task collect_data(wr_xtn xtn);
+	
+		@(vif.mon_cb);
+		while(vif.mon_cb.Psel!==1)
+			@(vif.mon_cb);
+	
+		while(vif.mon_cb.Pready !==1)
+			@(vif.mon_cb);
+
+		xtn.Paddr  = vif.mon_cb.Paddr;
+		xtn.Pwdata = vif.mon_cb.Pwdata;
+		xtn.Pwrite = vif.mon_cb.Pwrite;
+	        xtn.Psel   = vif.mon_cb.Psel;
+		xtn.Penable= vif.mon_cb.Penable;
+		xtn.Pready = vif.mon_cb.Pready;
+		xtn.Pslverr= vif.mon_cb.Pslverr;
+		xtn.IRQ    = vif.mon_cb.IRQ;
+
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'hc )
+			begin 
+				xtn.LCR = vif.mon_cb.Pwdata;
+			end
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h4 )
+			begin 
+				xtn.IER = vif.mon_cb.Pwdata;
+			end
+
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h8 )
+			begin 
+				xtn.FCR = vif.mon_cb.Pwdata;
+			end
+		
+			
+		if(xtn.Paddr == 32'h8 && xtn.Pwrite == 0)
+			begin
+				while(vif.mon_cb.IRQ !== 1)
+					@(vif.mon_cb);
+				xtn.IIR = vif.mon_cb.Prdata;
+			end
+
+		
+		if(xtn.Paddr == 32'h14 && xtn.Pwrite == 0)
+			begin 
+				xtn.LSR = vif.mon_cb.Prdata;
+			end
+
+		if(xtn.Paddr == 32'h10 && xtn.Pwrite == 1)
+			begin 
+				xtn.MCR = vif.mon_cb.Pwdata;
+			end
+
+		//DIV1
+		if(xtn.Paddr == 32'h20 && xtn.Pwrite == 1)
+			begin 
+				xtn.divisor[15:8] = vif.mon_cb.Pwdata;
+				xtn.dl_access     = 1'b1;
+			end
+		//DIV2
+		if(xtn.Paddr == 32'h1c && xtn.Pwrite == 1)
+			begin 
+				xtn.divisor[7:0] = vif.mon_cb.Pwdata;
+			end
+
+		//THR DATA
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h0 )
+			begin 
+				xtn.data_in_thr     = 1'b1;
+				if(xtn.THR.size == 0 || xtn.THR[0] != vif.mon_cb.Pwdata)
+				xtn.THR.push_back(vif.mon_cb.Pwdata);
+			end
+
+		//RBR DATA
+		if(vif.mon_cb.Pwrite == 0 && vif.mon_cb.Paddr == 32'h0 )
+			begin 
+				xtn.data_in_rbr     = 1'b1;
+
+				if(vif.mon_cb.Prdata !=0)
+					xtn.RBR.push_back(vif.mon_cb.Prdata);
+			end
+
+
+	//	`uvm_info("MONITOR","Printing from MONITOR",UVM_LOW);
+	//	xtn.print();
+		mon_ap.write(xtn);
+		//xtn.THR.delete();
+		//$display("THR %p",xtn.THR);
+		//$display("RBR %p",xtn.RBR);
+	endtask
+		
+endclass
+
+//**************************************************
+
+class base_seq extends uvm_sequence #(wr_xtn);
+
+	`uvm_object_utils(base_seq)
+
+	function new(string name="base_seq");
+		super.new(name);
+	endfunction
+endclass
+
+///////////////////////full_duplex////////////////////////
+class FD_seq0 extends base_seq;
+	
+	`uvm_object_utils(FD_seq0)
+
+	function new(string name="FD_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class FD_seq1 extends base_seq;
+	
+	`uvm_object_utils(FD_seq1)
+
+	function new(string name="FD_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+/////////////////////////////////////////////////HALF DUPLEX/////////////////////////////////////////////////
+class HD_seq0 extends base_seq;
+	
+	`uvm_object_utils(HD_seq0)
+
+	function new(string name="HD_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[1:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class HD_seq1 extends base_seq;
+	
+	`uvm_object_utils(HD_seq1)
+
+	function new(string name="HD_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+ 
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+
+//**********************************************************************
+class scoreboard extends uvm_scoreboard;
+
+	`uvm_component_utils(scoreboard)
+
+	uvm_tlm_analysis_fifo #(wr_xtn) sb_fifo_0; 
+	uvm_tlm_analysis_fifo #(wr_xtn) sb_fifo_1; 
+
+
+	wr_xtn xtn0, xtn1;
+
+	function new(string name="scoreboard",uvm_component parent);
+		super.new(name,parent);
+		sb_fifo_0 = new("sb_fifo_0");
+		sb_fifo_1 = new("sb_fifo_1");
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		xtn0 = wr_xtn::type_id::create("xtn0");
+		xtn1 = wr_xtn::type_id::create("xtn1");
+	endfunction
+		
+	
+	task run_phase(uvm_phase phase);
+		forever 
+			fork
+				begin 
+					sb_fifo_0.get(xtn0);
+					`uvm_info("SCOREBOARD","Printing from SEQ1",UVM_LOW);
+					xtn0.print();
+				end
+				begin 
+					sb_fifo_1.get(xtn1);
+					`uvm_info("SCOREBOARD","Printing from SEQ2",UVM_LOW);
+					xtn1.print();
+				end
+			join
+
+	endtask
+	
+	function void check_phase(uvm_phase phase);
+		$display("uart0 THR size : %d",xtn0.THR.size);
+		$display("uart1 THR size : %d",xtn1.THR.size);
+
+		$display("uart0 RBR size : %d",xtn0.RBR.size);
+		$display("uart1 RBR size : %d",xtn1.RBR.size);
+
+	//	$display("uart0 size : %d",xtn0.size);
+	//	$display("uart1 size : %d",xtn1.size);
+
+		$display("uart0 THR : %p",xtn0.THR);
+		$display("uart1 THR : %p",xtn1.THR);
+
+		$display("uart0 RBR : %p",xtn0.RBR);
+		$display("uart1 RBR : %p",xtn1.RBR);
+		
+		if((xtn0.IIR[3:0] == 3'b0100) || (xtn1.IIR[3:0] == 3'b0100))
+			begin 
+				if((xtn0.MCR[4] == 0) || (xtn1.MCR[4] == 0))
+					begin 
+						if(((xtn0.THR.size == 0) || (xtn1.THR.size == 0)) && ((xtn0.RBR.size == 0) || (xtn1.RBR.size == 0)))
+							begin 
+								if((xtn0.THR == xtn1.RBR) || (xtn1.THR == xtn0.RBR))
+									begin 
+										`uvm_info(get_type_name(),"\n COMPARISION PASSED FOR HALF DUPLEX",UVM_LOW);
+									end
+								else
+									begin 
+										`uvm_info(get_type_name(),"\n COMPARISION FAILED FOR HALF DUPLEX",UVM_LOW);
+									end
+							end
+						else
+							begin
+								if((xtn0.THR == xtn1.RBR) && (xtn1.THR == xtn0.RBR))
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION PASSED FOR FULL DUPLEX",UVM_LOW);
+									end
+								else
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION FAILED FOR FULL DUPLEX",UVM_LOW);
+									end
+
+							end
+
+					end
+			end
+		else
+			begin 
+				`uvm_info(get_type_name(),"\n COMPARISION DID NOT HAPPEND",UVM_LOW);
+			end
+
+	endfunction 
+
+
+
+endclass
+//
+888888888888888888888888888888888888888888888888888888888888888888888888
+
+
+
+
+class scoreboard extends uvm_scoreboard;
+
+	`uvm_component_utils(scoreboard)
+
+	uvm_tlm_analysis_fifo #(wr_xtn) sb_fifo_0; 
+	uvm_tlm_analysis_fifo #(wr_xtn) sb_fifo_1; 
+
+
+	wr_xtn xtn0, xtn1;
+
+	function new(string name="scoreboard",uvm_component parent);
+		super.new(name,parent);
+		sb_fifo_0 = new("sb_fifo_0");
+		sb_fifo_1 = new("sb_fifo_1");
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		xtn0 = wr_xtn::type_id::create("xtn0");
+		xtn1 = wr_xtn::type_id::create("xtn1");
+	endfunction
+		
+	
+	task run_phase(uvm_phase phase);
+		forever 
+			fork
+				begin 
+					sb_fifo_0.get(xtn0);
+					`uvm_info("SCOREBOARD","Printing from SEQ1",UVM_LOW);
+					xtn0.print();
+				end
+				begin 
+					sb_fifo_1.get(xtn1);
+					`uvm_info("SCOREBOARD","Printing from SEQ2",UVM_LOW);
+					xtn1.print();
+				end
+			join
+
+	endtask
+	
+	function void check_phase(uvm_phase phase);
+		$display("uart0 THR size : %d",xtn0.THR.size);
+		$display("uart1 THR size : %d",xtn1.THR.size);
+
+		$display("uart0 RBR size : %d",xtn0.RBR.size);
+		$display("uart1 RBR size : %d",xtn1.RBR.size);
+
+	//	$display("uart0 size : %d",xtn0.size);
+	//	$display("uart1 size : %d",xtn1.size);
+
+		$display("uart0 THR : %p",xtn0.THR);
+		$display("uart1 THR : %p",xtn1.THR);
+
+		$display("uart0 RBR : %p",xtn0.RBR);
+		$display("uart1 RBR : %p",xtn1.RBR);
+		$display("IIR         %b",xtn0.IIR[3:0]);
+		$display("IIR         %b",xtn1.IIR[3:0]);
+		$display("LSR         %b",xtn0.LSR);
+		$display("LSR         %b",xtn1.LSR);
+
+		
+		if((xtn0.IIR[3:0] == 4'b0100) || (xtn1.IIR[3:0] == 4'b0100))
+			begin 
+				if((xtn0.MCR[4] == 0) || (xtn1.MCR[4] == 0))
+					begin 
+						if(((xtn0.THR.size == 0) || (xtn1.THR.size == 0)) && ((xtn0.RBR.size == 0) || (xtn1.RBR.size == 0)))
+							begin 
+								if((xtn0.THR == xtn1.RBR) || (xtn1.THR == xtn0.RBR))
+									begin 
+										`uvm_info(get_type_name(),"\n COMPARISION PASSED FOR HALF DUPLEX",UVM_LOW);
+									end
+								else
+									begin 
+										`uvm_info(get_type_name(),"\n COMPARISION FAILED FOR HALF DUPLEX",UVM_LOW);
+									end
+							end
+						else
+							begin
+								if((xtn0.THR == xtn1.RBR) && (xtn1.THR == xtn0.RBR))
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION PASSED FOR FULL DUPLEX",UVM_LOW);
+									end
+								else
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION FAILED FOR FULL DUPLEX",UVM_LOW);
+									end
+
+							end
+
+					end
+				else if((xtn0.MCR[4] == 1) || (xtn1.MCR[4] == 1))
+					begin 
+						$display("Loop_Back Mode");
+								if((xtn1.THR == xtn1.RBR) || (xtn0.THR == xtn0.RBR))
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION PASSED FOR LOOP BACK",UVM_LOW);
+									end
+								else
+									begin
+										`uvm_info(get_type_name(),"\n COMPARISION FAILED FOR LOOP BACK",UVM_LOW);
+									end
+					end
+
+						
+			end
+		else if((xtn0.IIR[3:1] == 3) || (xtn1.IIR[3:1] == 3))
+			begin 
+				if((xtn0.LSR[2] == 1)||(xtn1.LSR[2] == 1))
+					begin 
+						`uvm_info(get_type_name(),"\n\n COMPARISION PASSED FOR PARITY ERROR",UVM_LOW);
+					end
+				else
+					begin
+						`uvm_info(get_type_name(),"\n\n COMPARISION FAILED FOR PARITY ERROR",UVM_LOW);
+					end
+
+				if((xtn0.LSR[3] == 1)||(xtn1.LSR[3] == 1))
+					begin 
+						`uvm_info(get_type_name(),"\n\n COMPARISION PASSED FOR FRAMING ERROR",UVM_LOW);
+					end
+				else
+					begin
+						`uvm_info(get_type_name(),"\n\n COMPARISION FAILED FOR FRAMING ERROR",UVM_LOW);
+					end
+
+				if((xtn0.LSR[4] == 1)||(xtn1.LSR[4] == 1))
+					begin 
+						`uvm_info(get_type_name(),"\n\n BREAK INTERRUPT OCCURED",UVM_LOW);
+					end
+				else
+					begin
+						`uvm_info(get_type_name(),"\n\n BREAK INTERRUPT NOT OCCURED",UVM_LOW);
+					end
+
+				if((xtn0.LSR[5] == 1)||(xtn1.LSR[5] == 1))
+					begin 
+						`uvm_info(get_type_name(),"\n\n TRANSMIT FIFO EMPTY OCCURED",UVM_LOW);
+					end
+				else
+					begin
+						`uvm_info(get_type_name(),"\n\n TRANSMIT FIFO EMPTY NOT OCCURED",UVM_LOW);
+					end
+
+
+
+				
+			end
+
+		else if((xtn0.IIR[3:0] == 2) || (xtn1.IIR[3:0] == 2))
+			begin
+				if((xtn0.IIR[3:0] == 2) || (xtn1.IIR[3:0] == 2))
+					begin 
+						`uvm_info(get_type_name(),"\n\n TRANSMIT FIFO EMPTY OCCURED",UVM_LOW);
+					end
+				else
+					begin
+						`uvm_info(get_type_name(),"\n\n TRANSMIT FIFO EMPTY NOT OCCURED",UVM_LOW);
+					end
+			end
+						
+
+		else if((xtn0.IIR[3:0] == 4'b1100) || (xtn1.IIR[3:0] == 4'b1100))
+			begin 
+				if((xtn0.IIR[3:0] == 4'b1100) || (xtn1.IIR[3:0] == 4'b1100))
+					begin 
+						`uvm_info(get_type_name(),"\n\n TIMEOUT ERROR OCCURED",UVM_LOW);
+					end
+				else
+					begin 	
+						`uvm_info(get_type_name(),"\n\n TIMEOUT ERROR NOT OCCURED",UVM_LOW);
+					end
+			end
+
+					
+				
+
+	endfunction 
+
+
+
+endclass
+
+//////////////////////////////////////////////////////////////////////
+
+class base_seq extends uvm_sequence #(wr_xtn);
+
+	`uvm_object_utils(base_seq)
+
+	function new(string name="base_seq");
+		super.new(name);
+	endfunction
+endclass
+
+///////////////////////full_duplex////////////////////////
+class FD_seq0 extends base_seq;
+	
+	`uvm_object_utils(FD_seq0)
+
+	function new(string name="FD_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class FD_seq1 extends base_seq;
+	
+	`uvm_object_utils(FD_seq1)
+
+	function new(string name="FD_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+/////////////////////////////////////////////////HALF DUPLEX/////////////////////////////////////////////////
+class HD_seq0 extends base_seq;
+	
+	`uvm_object_utils(HD_seq0)
+
+	function new(string name="HD_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[1:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class HD_seq1 extends base_seq;
+	
+	`uvm_object_utils(HD_seq1)
+
+	function new(string name="HD_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+ 
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+///////////////////////Loop_back////////////////////////
+
+class LB_seq0 extends base_seq;
+	
+	`uvm_object_utils(LB_seq0)
+
+	function new(string name="LB_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//MCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h10; Pwdata==8'b00010000;})
+		$display("IER UART1");
+		finish_item(req);
+
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class LB_seq1 extends base_seq;
+	
+	`uvm_object_utils(LB_seq1)
+
+	function new(string name="LB_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART2");
+		finish_item(req);
+
+		//MCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h10; Pwdata==8'b00010000;})
+		$display("IER UART1");
+		finish_item(req);
+
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+////////////////////////////////////////////PARITY_SEQUENCE////////////////////////////////////////
+class Parity_seq0 extends base_seq;
+	
+	`uvm_object_utils(Parity_seq0)
+
+	function new(string name="Parity_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00011111;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class Parity_seq1 extends base_seq;
+	
+	`uvm_object_utils(Parity_seq1)
+
+	function new(string name="Parity_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00001011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+/////////////////////////////////////////////////FRAMING ERROR///////////////////////////////////////////////////////////
+class FE_seq0 extends base_seq;
+	
+	`uvm_object_utils(FE_seq0)
+
+	function new(string name="FD_seq0");
+		super.new(name);
+	endfunction
+
+		task body();
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[1:255]};})
+		$display("THR UART1");
+		finish_item(req);
+/*
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+ 
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+*/
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+ 	endtask
+	
+endclass
+
+class FE_seq1 extends base_seq;
+	
+	`uvm_object_utils(FE_seq1)
+
+	function new(string name="FD_seq");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000000;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+	/*	
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		*/
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+ 
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+endclass
+
+///////////////////////OVERRUN ERROR////////////////////////
+class OV_seq0 extends base_seq;
+	
+	`uvm_object_utils(OV_seq0)
+
+	function new(string name="OV_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000111;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+	/*	if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end*/
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class OV_seq1 extends base_seq;
+	
+	`uvm_object_utils(OV_seq1)
+
+	function new(string name="OV_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000111;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+	/*	if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end*/
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+
+///////////////////////BREAK ERROR////////////////////////
+class BE_seq0 extends base_seq;
+	
+	`uvm_object_utils(BE_seq0)
+
+	function new(string name="BE_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b01000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class BE_seq1 extends base_seq;
+	
+	`uvm_object_utils(BE_seq1)
+
+	function new(string name="BE_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b01000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000101;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+///////////////////////TRANSMIT FIFO EMPTY////////////////////////
+class TFE_seq0 extends base_seq;
+	
+	`uvm_object_utils(TFE_seq0)
+
+	function new(string name="TFE_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000111;})
+		$display("IER UART1");
+		finish_item(req);
+/*
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+*/
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class TFE_seq1 extends base_seq;
+	
+	`uvm_object_utils(TFE_seq1)
+
+	function new(string name="TFE_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000111;})
+		$display("IER UART2");
+
+		finish_item(req);
+/*
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+*/		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+
+///////////////////////full_duplex////////////////////////
+class TE_seq0 extends base_seq;
+	
+	`uvm_object_utils(TE_seq0)
+
+	function new(string name="TE_seq0");
+		super.new(name);
+	endfunction
+
+	task body();
+
+	     begin
+
+		req=wr_xtn::type_id::create("req");
+
+		//DIV1 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART1");
+		finish_item(req);
+
+		//DIV1 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==27;})
+		$display("DIV 1 LSB UART1");
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART1");
+		finish_item(req);
+
+
+		//FIFO Control  Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART1");
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART1");
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside{[0:255]};})
+		$display("THR UART1");
+		finish_item(req);
+
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART1");
+	//	$display("#################################xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx#######################");
+		finish_item(req);
+	//	$display("##################################zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz#######################");
+		get_response(req);
+
+/*		//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end*/
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+
+ 
+
+		//`uvm_info("FD_SEQ0","Printing from seq of FD_Seq0",UVM_LOW);
+		//req.print;
+
+ 	endtask
+	
+endclass
+
+class TE_seq1 extends base_seq;
+	
+	`uvm_object_utils(TE_seq1)
+
+	function new(string name="TE_seq1");
+		super.new(name);
+	endfunction
+
+	task body();
+	
+	     begin
+		req=wr_xtn::type_id::create("req");
+
+		//DIV2 MSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h20; Pwdata==0;})
+		$display("DIV 1 MSB UART2");
+		finish_item(req);
+		
+		//DIV2 LSB
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h1C; Pwdata==54;})
+		$display("DIV 1 LSB UART2");
+
+		finish_item(req);
+
+		//LCR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'hC; Pwdata==8'b00000011;})
+		$display("LCR UART2");
+
+		finish_item(req);
+
+		//FIFO Control Register
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h8; Pwdata==8'b00000110;})
+		$display("FCR UART2");
+
+		finish_item(req);
+
+		//IER
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h4; Pwdata==8'b00000001;})
+		$display("IER UART2");
+
+		finish_item(req);
+
+		//THR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==1; Paddr==32'h0; Pwdata inside {[0:255]};})
+		$display("THR UART2");
+		finish_item(req);
+		
+		//IIR
+		start_item(req);
+		assert(req.randomize() with {Pwrite==0; Paddr==32'h8;}) 
+		$display("IIR UART2");
+
+		finish_item(req);
+		get_response(req);
+	
+	/*	//RBR
+		if(req.IIR[3:0] == 4)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h0;Pwrite == 0;})
+				finish_item(req);
+			end*/
+			
+		//LSR
+		if(req.IIR[3:0] == 6)
+			begin 
+				start_item(req);
+				assert(req.randomize() with {Paddr == 32'h14; Pwrite == 0;})
+				finish_item(req);
+			end
+	
+		end
+	//	`uvm_info("FD_SEQ1","Printing from seq of FD_Seq1",UVM_LOW);
+	//	req.print;
+
+
+	endtask
+
+endclass
+
+/////////////////////////////////////////////////
+class wr_driver extends uvm_driver#(wr_xtn);
+
+	`uvm_component_utils(wr_driver)
+
+	wr_config w_cfg;
+	
+	virtual uart_if.DRV_MP vif;
+
+	function new(string name="wr_driver",uvm_component parent);
+		super.new(name,parent);
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		if(!uvm_config_db #(wr_config)::get(this,"","wr_config",w_cfg))
+			`uvm_fatal("WR_DRIVER","cannot get config class have you set it?");
+	endfunction
+	
+	function void connect_phase(uvm_phase phase);
+		vif = w_cfg.vif;
+		$display("DRIVER %p",vif);
+	endfunction
+
+	task run_phase(uvm_phase phase);
+	reset;
+
+	forever
+		begin
+
+			seq_item_port.get_next_item(req);
+			drive(req);
+			seq_item_port.item_done();
+		end
+	endtask
+
+	task drive(wr_xtn xtn);
+	//	`uvm_info("DRIVER","Printing from DRIVER",UVM_LOW);
+	//	xtn.print();
+		@(vif.drv_cb);
+//	$display("##################################11111111111111111111111111111#######################");
+
+		vif.drv_cb.Paddr  <= xtn.Paddr;
+		vif.drv_cb.Pwdata <= xtn.Pwdata;
+		vif.drv_cb.Pwrite <= xtn.Pwrite;
+		vif.drv_cb.Psel   <= 1'b1;
+		vif.drv_cb.Penable<= 1'b0;
+//	$display("##################################222222222222222222222222222222222#######################");
+
+		@(vif.drv_cb);
+			vif.drv_cb.Penable <= 1'b1;
+//	$display("##################################33333333333333333333333333333333#######################");
+
+		while(vif.drv_cb.Pready !==1)
+			@(vif.drv_cb);
+//	$display("##################################444444444444444444444444444444444#######################");
+	
+		if(xtn.Paddr == 32'h8 && xtn.Pwrite == 0)
+			begin 
+			//	$display("##################################5555555555555555555555555555555555555#######################");
+
+				while(vif.drv_cb.IRQ !== 1)
+					@(vif.drv_cb);
+			//	$display("##################################666666666666666666666666666666666666666#######################");
+
+				xtn.IIR = vif.drv_cb.Prdata;
+				seq_item_port.put_response(xtn);
+			end				
+	endtask
+	
+	task reset;
+		@(vif.drv_cb);
+		vif.drv_cb.Presetn <= 1'b0;
+		@(vif.drv_cb);
+		vif.drv_cb.Presetn <= 1'b1;
+	endtask
+		
+
+endclass
+///////////////////////////////////////////////
+
+class wr_monitor extends uvm_monitor;
+
+	`uvm_component_utils(wr_monitor)
+
+	wr_config w_cfg;
+	wr_xtn xtn;
+
+	virtual uart_if.MON_MP vif;
+	
+	uvm_analysis_port #(wr_xtn) mon_ap;
+
+	function new(string name="wr_monitor",uvm_component parent);
+		super.new(name,parent);
+		mon_ap = new("mon_ap",this);
+	endfunction
+
+	function void build_phase(uvm_phase phase);
+		super.build_phase(phase);
+		xtn = wr_xtn::type_id::create("xtn");
+		if(!uvm_config_db #(wr_config)::get(this,"","wr_config",w_cfg))
+			`uvm_fatal("WR_MONITOR","cannot get config class have you set it?");
+		
+	endfunction
+
+	function void connect_phase(uvm_phase phase);
+		vif = w_cfg.vif;
+		$display("MONITOR %p",vif);
+	endfunction
+	
+	task run_phase(uvm_phase phase);
+		forever
+			begin 
+				//xtn = wr_xtn::type_id::create("xtn");
+				collect_data(xtn);
+			end
+	endtask
+
+	task collect_data(wr_xtn xtn);
+	
+		@(vif.mon_cb);
+		while(vif.mon_cb.Psel!==1)
+			@(vif.mon_cb);
+	
+		while(vif.mon_cb.Pready !==1)
+			@(vif.mon_cb);
+
+		xtn.Paddr  = vif.mon_cb.Paddr;
+		xtn.Pwdata = vif.mon_cb.Pwdata;
+		xtn.Pwrite = vif.mon_cb.Pwrite;
+	        xtn.Psel   = vif.mon_cb.Psel;
+		xtn.Penable= vif.mon_cb.Penable;
+		xtn.Pready = vif.mon_cb.Pready;
+		xtn.Pslverr= vif.mon_cb.Pslverr;
+		xtn.IRQ    = vif.mon_cb.IRQ;
+
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'hc )
+			begin 
+				xtn.LCR = vif.mon_cb.Pwdata;
+			end
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h4 )
+			begin 
+				xtn.IER = vif.mon_cb.Pwdata;
+			end
+
+
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h8 )
+			begin 
+				xtn.FCR = vif.mon_cb.Pwdata;
+			end
+		
+			
+		if(xtn.Paddr == 32'h8 && xtn.Pwrite == 0)
+			begin
+				while(vif.mon_cb.IRQ != 1)
+					@(vif.mon_cb);
+				xtn.IIR = vif.mon_cb.Prdata;
+			end
+
+		
+		if(xtn.Paddr == 32'h14 && xtn.Pwrite == 0)
+			begin 
+				xtn.LSR = vif.mon_cb.Prdata;
+			end
+
+		if(xtn.Paddr == 32'h10 && xtn.Pwrite == 1)
+			begin 
+				xtn.MCR = vif.mon_cb.Pwdata;
+			end
+
+		//DIV1
+		if(xtn.Paddr == 32'h20 && xtn.Pwrite == 1)
+			begin 
+				xtn.divisor[15:8] = vif.mon_cb.Pwdata;
+				xtn.dl_access     = 1'b1;
+			end
+		//DIV2
+		if(xtn.Paddr == 32'h1c && xtn.Pwrite == 1)
+			begin 
+				xtn.divisor[7:0] = vif.mon_cb.Pwdata;
+			end
+
+		//THR DATA
+		if(vif.mon_cb.Pwrite == 1 && vif.mon_cb.Paddr == 32'h0 )
+			begin 
+				xtn.data_in_thr     = 1'b1;
+				if(xtn.THR.size == 0 || xtn.THR[0] != vif.mon_cb.Pwdata)
+				xtn.THR.push_back(vif.mon_cb.Pwdata);
+			end
+
+		//RBR DATA
+		if(vif.mon_cb.Pwrite == 0 && vif.mon_cb.Paddr == 32'h0 )
+			begin 
+				xtn.data_in_rbr     = 1'b1;
+
+				if(vif.mon_cb.Prdata !=0)
+					xtn.RBR.push_back(vif.mon_cb.Prdata);
+			end
+
+
+	//	`uvm_info("MONITOR","Printing from MONITOR",UVM_LOW);
+	//	xtn.print();
+		mon_ap.write(xtn);
+		//xtn.THR.delete();
+	//	$display("THR %p",xtn.THR);
+	//	$display("RBR %p",xtn.RBR);
+	endtask
+		
+endclass
+
+
+
+
+
+
+

@@ -1,0 +1,604 @@
+# vsim -cvgperinstance -vopt -voptargs="+acc" -coverage -sva -c -do " log -r /* ;coverage save -onexit mem_cov8;run -all; exit" -wlf wave_file8.wlf -l test8.log -sv_seed 126531714 work.top "+UVM_TESTNAME=break_error_test" 
+# Start time: 14:34:22 on Mar 09,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# //  Questa Sim-64
+# //  Version 2022.1_2 linux_x86_64 Apr  2 2022
+# //
+# //  Copyright 1991-2022 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.uart_if(fast)
+# Loading mtiUvm.uvm_pkg(fast)
+# Loading work.pkg(fast)
+# Loading mtiUvm.questa_uvm_pkg(fast)
+# Loading work.top(fast)
+# Loading work.uart_if(fast__2)
+# Loading work.uart_16550(fast)
+# Loading work.uart_register_file(fast)
+# Loading work.uart_tx(fast)
+# Loading work.uart_fifo(fast)
+# Loading work.uart_rx(fast)
+# Loading /home/cad/eda/Mentor_Graphics/Questasim/questasim/uvm-1.1d/linux_x86_64/uvm_dpi.so
+# ** Warning: (vsim-8634) Code was not compiled with coverage options.
+#  log -r /* 
+# coverage save -onexit mem_cov8
+# run -all
+# ----------------------------------------------------------------
+# UVM-1.1d
+# (C) 2007-2013 Mentor Graphics Corporation
+# (C) 2007-2013 Cadence Design Systems, Inc.
+# (C) 2006-2013 Synopsys, Inc.
+# (C) 2011-2013 Cypress Semiconductor Corp.
+# ----------------------------------------------------------------
+# 
+#   ***********       IMPORTANT RELEASE NOTES         ************
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_NO_DEPRECATED undefined.
+#   See http://www.eda.org/svdb/view.php?id=3313 for more details.
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_OBJECT_MUST_HAVE_CONSTRUCTOR undefined.
+#   See http://www.eda.org/svdb/view.php?id=3770 for more details.
+# 
+#       (Specify +UVM_NO_RELNOTES to turn off this notice)
+# 
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(277) @ 0: reporter [Questa UVM] QUESTA_UVM-1.2.3
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(278) @ 0: reporter [Questa UVM]  questa_uvm::init(+struct)
+# UVM_INFO @ 0: reporter [RNTST] Running test break_error_test...
+# UVM_INFO @ 0: reporter [UVMTOP] UVM testbench topology:
+# --------------------------------------------------------------------
+# Name                         Type                        Size  Value
+# --------------------------------------------------------------------
+# sb_fifo_0                    uvm_tlm_analysis_fifo #(T)  -     @513 
+#   analysis_export            uvm_analysis_imp            -     @552 
+#   get_ap                     uvm_analysis_port           -     @544 
+#   get_peek_export            uvm_get_peek_imp            -     @528 
+#   put_ap                     uvm_analysis_port           -     @536 
+#   put_export                 uvm_put_imp                 -     @520 
+# sb_fifo_1                    uvm_tlm_analysis_fifo #(T)  -     @560 
+#   analysis_export            uvm_analysis_imp            -     @599 
+#   get_ap                     uvm_analysis_port           -     @591 
+#   get_peek_export            uvm_get_peek_imp            -     @575 
+#   put_ap                     uvm_analysis_port           -     @583 
+#   put_export                 uvm_put_imp                 -     @567 
+# uvm_test_top                 break_error_test            -     @475 
+#   envh                       env                         -     @491 
+#     agt_top                  agent_top                   -     @499 
+#       agth[0]                agent                       -     @608 
+#         drvh                 driver                      -     @645 
+#           rsp_port           uvm_analysis_port           -     @660 
+#           seq_item_port      uvm_seq_item_pull_port      -     @652 
+#         monh                 monitor                     -     @630 
+#           mon_ap             uvm_analysis_port           -     @637 
+#         seqrh                sequencer                   -     @668 
+#           rsp_export         uvm_analysis_export         -     @675 
+#           seq_item_export    uvm_seq_item_pull_imp       -     @769 
+#           arbitration_queue  array                       0     -    
+#           lock_queue         array                       0     -    
+#           num_last_reqs      integral                    32    'd1  
+#           num_last_rsps      integral                    32    'd1  
+#       agth[1]                agent                       -     @620 
+#         drvh                 driver                      -     @804 
+#           rsp_port           uvm_analysis_port           -     @819 
+#           seq_item_port      uvm_seq_item_pull_port      -     @811 
+#         monh                 monitor                     -     @789 
+#           mon_ap             uvm_analysis_port           -     @796 
+#         seqrh                sequencer                   -     @827 
+#           rsp_export         uvm_analysis_export         -     @834 
+#           seq_item_export    uvm_seq_item_pull_imp       -     @928 
+#           arbitration_queue  array                       0     -    
+#           lock_queue         array                       0     -    
+#           num_last_reqs      integral                    32    'd1  
+#           num_last_rsps      integral                    32    'd1  
+#     sbh                      sb                          -     @506 
+# --------------------------------------------------------------------
+# 
+# UVM_INFO ../agent/driver.sv(67) @ 75: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'h20 
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd1  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 75: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 105: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'h1c 
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd70 
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 105: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 135: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'hc  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd67 
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 135: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 150: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'h20 
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd2  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 150: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 165: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'h8  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd6  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 165: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 195: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'h4  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd5  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 195: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 210: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'h1c 
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd140
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 210: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 225: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @969 
+#   paddr        integral  32    'h0  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd230
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 225: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 270: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'hc  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd67 
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 270: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 330: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'h8  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd6  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 330: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 390: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'h4  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd5  
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 390: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 450: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  ------------------------------------
+# Name           Type      Size  Value
+# ------------------------------------
+# req            xtn       -     @973 
+#   paddr        integral  32    'h0  
+#   presetn      integral  1     'd0  
+#   pwdata       integral  32    'd222
+#   prdata       integral  32    'd0  
+#   psel         integral  1     'd0  
+#   pwrite       integral  1     1    
+#   penable      integral  1     'd0  
+#   pready       integral  1     'd0  
+#   pslaverr     integral  1     'd0  
+#   FCR          integral  8     'd0  
+#   LCR          integral  8     'd0  
+#   DIV1         integral  8     'd0  
+#   IER          integral  8     'd0  
+#   MSR          integral  8     'd0  
+#   IIR          integral  8     'b0  
+#   IRQ          integral  8     'd0  
+#   MCR          integral  8     'b0  
+#   LSR          integral  8     'b0  
+#   data_in_thr  integral  1     'd0  
+#   data_in_rbr  integral  1     'd0  
+#   d1_access    integral  1     'd0  
+# ------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 450: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/monitor.sv(118) @ 518515: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 518525: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  -------------------------------------------
+# Name           Type      Size  Value       
+# -------------------------------------------
+# req            xtn       -     @969        
+#   paddr        integral  32    'h8         
+#   presetn      integral  1     'd0         
+#   pwdata       integral  32    'd1658333291
+#   prdata       integral  32    'd0         
+#   psel         integral  1     'd0         
+#   pwrite       integral  1     'd0         
+#   penable      integral  1     'd0         
+#   pready       integral  1     'd0         
+#   pslaverr     integral  1     'd0         
+#   FCR          integral  8     'd0         
+#   LCR          integral  8     'd0         
+#   DIV1         integral  8     'd0         
+#   IER          integral  8     'd0         
+#   MSR          integral  8     'd0         
+#   IIR          integral  8     'b11000110  
+#   IRQ          integral  8     'd0         
+#   MCR          integral  8     'b0         
+#   LSR          integral  8     'b0         
+#   data_in_thr  integral  1     'd0         
+#   data_in_rbr  integral  1     'd0         
+#   d1_access    integral  1     'd0         
+# -------------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 518545: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 518585: uvm_test_top.envh.agt_top.agth[0].drvh [DRIVER] DATA FROM DRIVER 
+#  -----------------------------------------
+# Name           Type      Size  Value     
+# -----------------------------------------
+# req            xtn       -     @969      
+#   paddr        integral  32    'h14      
+#   presetn      integral  1     'd0       
+#   pwdata       integral  32    2719024539
+#   prdata       integral  32    'd0       
+#   psel         integral  1     'd0       
+#   pwrite       integral  1     'd0       
+#   penable      integral  1     'd0       
+#   pready       integral  1     'd0       
+#   pslaverr     integral  1     'd0       
+#   FCR          integral  8     'd0       
+#   LCR          integral  8     'd0       
+#   DIV1         integral  8     'd0       
+#   IER          integral  8     'd0       
+#   MSR          integral  8     'd0       
+#   IIR          integral  8     'b11000110
+#   IRQ          integral  8     'd0       
+#   MCR          integral  8     'b0       
+#   LSR          integral  8     'b0       
+#   data_in_thr  integral  1     'd0       
+#   data_in_rbr  integral  1     'd0       
+#   d1_access    integral  1     'd0       
+# -----------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 518585: uvm_test_top.envh.agt_top.agth[0].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/monitor.sv(118) @ 1447790: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 1447810: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  -----------------------------------------
+# Name           Type      Size  Value     
+# -----------------------------------------
+# req            xtn       -     @973      
+#   paddr        integral  32    'h8       
+#   presetn      integral  1     'd0       
+#   pwdata       integral  32    2651384040
+#   prdata       integral  32    'd0       
+#   psel         integral  1     'd0       
+#   pwrite       integral  1     'd0       
+#   penable      integral  1     'd0       
+#   pready       integral  1     'd0       
+#   pslaverr     integral  1     'd0       
+#   FCR          integral  8     'd0       
+#   LCR          integral  8     'd0       
+#   DIV1         integral  8     'd0       
+#   IER          integral  8     'd0       
+#   MSR          integral  8     'd0       
+#   IIR          integral  8     'b11000110
+#   IRQ          integral  8     'd0       
+#   MCR          integral  8     'b0       
+#   LSR          integral  8     'b0       
+#   data_in_thr  integral  1     'd0       
+#   data_in_rbr  integral  1     'd0       
+#   d1_access    integral  1     'd0       
+# -----------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 1447850: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO ../agent/driver.sv(67) @ 1447930: uvm_test_top.envh.agt_top.agth[1].drvh [DRIVER] DATA FROM DRIVER 
+#  -------------------------------------------
+# Name           Type      Size  Value       
+# -------------------------------------------
+# req            xtn       -     @973        
+#   paddr        integral  32    'h14        
+#   presetn      integral  1     'd0         
+#   pwdata       integral  32    'd1580936614
+#   prdata       integral  32    'd0         
+#   psel         integral  1     'd0         
+#   pwrite       integral  1     'd0         
+#   penable      integral  1     'd0         
+#   pready       integral  1     'd0         
+#   pslaverr     integral  1     'd0         
+#   FCR          integral  8     'd0         
+#   LCR          integral  8     'd0         
+#   DIV1         integral  8     'd0         
+#   IER          integral  8     'd0         
+#   MSR          integral  8     'd0         
+#   IIR          integral  8     'b11000110  
+#   IRQ          integral  8     'd0         
+#   MCR          integral  8     'b0         
+#   LSR          integral  8     'b0         
+#   data_in_thr  integral  1     'd0         
+#   data_in_rbr  integral  1     'd0         
+#   d1_access    integral  1     'd0         
+# -------------------------------------------
+# 
+# UVM_INFO ../agent/monitor.sv(118) @ 1447930: uvm_test_top.envh.agt_top.agth[1].monh [APB MONITOR] PRINTING FROM MONITOR
+# UVM_INFO verilog_src/uvm-1.1d/src/base/uvm_objection.svh(1267) @ 1448030: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+# uart1 THR size :           1
+# uart2 RBR size :           0
+# uart2 THR size :           1
+# uart1 RBR size :           0
+# uart1 THR : '{230}
+# uart2 RBR : '{}
+# uart2 THR : '{222}
+# uart1 RBR : '{}
+# IIR xtn 1 --------------  0000
+# IIR xtn 2--------------  0000
+# LSR xtn 1---------------10110000
+# LSR xtn 2---------------10110000
+# 
+# --- UVM Report Summary ---
+# 
+# ** Report counts by severity
+# UVM_INFO :   39
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    0
+# ** Report counts by id
+# [APB MONITOR]    18
+# [DRIVER]    16
+# [Questa UVM]     2
+# [RNTST]     1
+# [TEST_DONE]     1
+# [UVMTOP]     1
+# ** Note: $finish    : /home/cad/eda/Mentor_Graphics/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh(430)
+#    Time: 1448030 ns  Iteration: 54  Instance: /top
+# Saving coverage database on exit...
+# End time: 14:34:23 on Mar 09,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 1

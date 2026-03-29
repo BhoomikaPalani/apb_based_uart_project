@@ -1,0 +1,373 @@
+<design>
+<info vcs_call_id='TBD' lang='C' date='Wed Sep  3 14:16:38 2025' elabdir='/home1/BPRN19/BhommiKaP/VLSI_RN_ONLINE/UVM_LABS/uart_final_project/sim' simulator='vcs' />
+<package i='99' n='CPP' />
+<type i='100' f='1:127' p='99' n='DIR' />
+<type i='101' f='2:94' p='99' n='Dl_info' />
+<type i='102' f='2:189' p='99' n='Dl_serinfo' />
+<type i='103' f='2:180' p='99' n='Dl_serpath' />
+<type i='104' f='3:48' p='99' n='Elf64_Addr' />
+<type i='105' f='3:837' p='99' n='Elf64_Dyn' />
+<type i='106' f='3:101' p='99' n='Elf64_Ehdr' />
+<type i='107' f='3:32' p='99' n='Elf64_Half' />
+<type i='108' f='4:1987' p='99' n='Elf64_Lib' />
+<type i='109' f='4:1229' p='99' n='Elf64_Nhdr' />
+<type i='110' f='3:52' p='99' n='Elf64_Off' />
+<type i='111' f='3:700' p='99' n='Elf64_Phdr' />
+<type i='112' f='4:664' p='99' n='Elf64_Rela' />
+<type i='113' f='3:56' p='99' n='Elf64_Section' />
+<type i='114' f='3:44' p='99' n='Elf64_Sxword' />
+<type i='115' f='3:536' p='99' n='Elf64_Sym' />
+<type i='116' f='4:1053' p='99' n='Elf64_Verdaux' />
+<type i='117' f='4:1020' p='99' n='Elf64_Verdef' />
+<type i='118' f='4:1106' p='99' n='Elf64_Vernaux' />
+<type i='119' f='4:1078' p='99' n='Elf64_Verneed' />
+<type i='120' f='3:60' p='99' n='Elf64_Versym' />
+<type i='121' f='3:37' p='99' n='Elf64_Word' />
+<type i='122' f='3:43' p='99' n='Elf64_Xword' />
+<type i='123' f='3:1140' p='99' n='Elf64_auxv_t' />
+<type i='124' f='5:14' p='99' n='Elf_Symndx' />
+<type i='125' f='6:7' p='99' n='FILE' />
+<struct i='126' f='7:86' p='99' n='La_x86_64_regs' />
+<type i='127' f='8:27' p='99' n='uint64_t' />
+<mvar f='7:88' p='126' n='lr_rdx' t='uint64_t' />
+<mvar f='7:89' p='126' n='lr_r8' t='uint64_t' />
+<mvar f='7:90' p='126' n='lr_r9' t='uint64_t' />
+<mvar f='7:91' p='126' n='lr_rcx' t='uint64_t' />
+<mvar f='7:92' p='126' n='lr_rsi' t='uint64_t' />
+<mvar f='7:93' p='126' n='lr_rdi' t='uint64_t' />
+<mvar f='7:94' p='126' n='lr_rbp' t='uint64_t' />
+<mvar f='7:95' p='126' n='lr_rsp' t='uint64_t' />
+<mvar f='7:96' p='126' n='lr_xmm' t='La_x86_64_xmm[8]' />
+<mvar f='7:97' p='126' n='lr_vector' t='La_x86_64_vector[8]' />
+<mvar f='7:99' p='126' n='lr_bnd' t='__int128[4]' />
+<struct i='128' f='7:104' p='99' n='La_x86_64_retval' />
+<mvar f='7:106' p='128' n='lrv_rax' t='uint64_t' />
+<mvar f='7:107' p='128' n='lrv_rdx' t='uint64_t' />
+<type i='129' f='7:68' p='99' n='La_x86_64_xmm' />
+<mvar f='7:108' p='128' n='lrv_xmm0' t='La_x86_64_xmm' />
+<mvar f='7:109' p='128' n='lrv_xmm1' t='La_x86_64_xmm' />
+<mvar f='7:110' p='128' n='lrv_st0' t='long double' />
+<mvar f='7:111' p='128' n='lrv_st1' t='long double' />
+<type i='130' f='7:84' p='99' n='La_x86_64_vector' />
+<mvar f='7:112' p='128' n='lrv_vector0' t='La_x86_64_vector' />
+<mvar f='7:113' p='128' n='lrv_vector1' t='La_x86_64_vector' />
+<mvar f='7:115' p='128' n='lrv_bnd0' t='__int128' />
+<mvar f='7:116' p='128' n='lrv_bnd1' t='__int128' />
+<type i='131' f='7:69' p='99' n='La_x86_64_ymm' />
+<type i='132' f='7:71' p='99' n='La_x86_64_zmm' />
+<type i='133' f='9:44' p='99' n='Lmid_t' />
+<struct i='134' f='10:5' p='99' n='' />
+<mvar f='10:7' p='134' n='__val' t='long unsigned int[16]' />
+<struct i='135' f='11:31' p='99' n='in_addr' />
+<type i='136' f='11:30' p='99' n='in_addr_t' />
+<mvar f='11:33' p='135' n='s_addr' t='in_addr_t' />
+<struct i='137' f='11:242' p='99' n='sockaddr_in' />
+<type i='138' f='12:28' p='99' n='sa_family_t' />
+<mvar f='11:244' p='137' n='sin_family' t='sa_family_t' />
+<type i='139' f='11:123' p='99' n='in_port_t' />
+<mvar f='11:245' p='137' n='sin_port' t='in_port_t' />
+<mvar f='11:246' p='137' n='sin_addr' t='in_addr' />
+<mvar f='11:249' p='137' n='sin_zero' t='unsigned char[8]' />
+<struct i='140' f='13:191' p='99' n='_pthread_cleanup_buffer' />
+<mvar f='13:193' p='140' n='__routine' t='==============not_yet_found==========*' />
+<mvar f='13:195' p='140' n='__canceltype' t='int' />
+<mvar f='13:196' p='140' n='__prev' t='_pthread_cleanup_buffer*' />
+<struct i='141' f='14:39' p='99' n='_tunable' />
+<mvar f='14:41' p='141' n='name' t='char*' />
+<type i='142' f='15:37' p='99' n='tunable_type_t' />
+<mvar f='14:42' p='141' n='type' t='tunable_type_t' />
+<type i='143' f='15:43' p='99' n='tunable_val_t' />
+<mvar f='14:43' p='141' n='val' t='tunable_val_t' />
+<mvar f='14:44' p='141' n='initialized' t='_Bool' />
+<type i='144' f='15:59' p='99' n='tunable_seclevel_t' />
+<mvar f='14:46' p='141' n='security_level' t='tunable_seclevel_t' />
+<mvar f='14:57' p='141' n='env_alias' t='char*' />
+<struct i='145' f='16:293' p='99' n='abort_msg_s' />
+<mvar f='16:295' p='145' n='size' t='unsigned int' />
+<mvar f='16:296' p='145' n='msg' t='char' />
+<struct i='146' f='17:2237' p='99' n='add_path_state' />
+<mvar f='17:2239' p='146' n='counting' t='_Bool' />
+<mvar f='17:2240' p='146' n='idx' t='unsigned int' />
+<mvar f='17:2241' p='146' n='si' t='Dl_serinfo*' />
+<mvar f='17:2242' p='146' n='allocptr' t='char*' />
+<type i='147' f='18:41' p='99' n='atomic64_t' />
+<struct i='148' f='19:243' p='99' n='audit_ifaces' />
+<mvar f='19:245' p='148' n='activity' t='==============not_yet_found==========*' />
+<mvar f='19:246' p='148' n='objsearch' t='char**' />
+<mvar f='19:247' p='148' n='objopen' t='unsigned int*' />
+<mvar f='19:248' p='148' n='preinit' t='==============not_yet_found==========*' />
+<mvar f='20:0' p='148' n='' t='' />
+<mvar f='20:0' p='148' n='' t='' />
+<mvar f='20:0' p='148' n='' t='' />
+<mvar f='19:268' p='148' n='objclose' t='unsigned int*' />
+<mvar f='19:270' p='148' n='next' t='audit_ifaces*' />
+<struct i='149' f='21:40' p='99' n='audit_list' />
+<mvar f='21:45' p='149' n='audit_strings' t='char*[16]' />
+<mvar f='21:48' p='149' n='length' t='size_t' />
+<mvar f='21:51' p='149' n='current_index' t='size_t' />
+<mvar f='21:55' p='149' n='current_tail' t='char*' />
+<mvar f='21:59' p='149' n='fname' t='char[255]' />
+<struct i='150' f='22:352' p='99' n='auditstate' />
+<type i='151' f='23:90' p='99' n='uintptr_t' />
+<mvar f='22:354' p='150' n='cookie' t='uintptr_t' />
+<mvar f='22:355' p='150' n='bindflags' t='unsigned int' />
+<struct i='152' f='24:219' p='99' n='cache_extension_section' />
+<type i='153' f='25:26' p='99' n='uint32_t' />
+<mvar f='24:222' p='152' n='tag' t='uint32_t' />
+<mvar f='24:225' p='152' n='flags' t='uint32_t' />
+<mvar f='24:229' p='152' n='offset' t='uint32_t' />
+<mvar f='24:233' p='152' n='size' t='uint32_t' />
+<struct i='154' f='24:238' p='99' n='cache_extension' />
+<mvar f='24:240' p='154' n='magic' t='uint32_t' />
+<mvar f='24:241' p='154' n='count' t='uint32_t' />
+<mvar f='24:245' p='154' n='sections' t='cache_extension_section' />
+<struct i='155' f='24:249' p='99' n='cache_extension_loaded' />
+<mvar f='24:253' p='155' n='base' t='==============not_yet_found==========*' />
+<mvar f='24:254' p='155' n='size' t='size_t' />
+<mvar f='24:257' p='155' n='flags' t='uint32_t' />
+<struct i='156' f='24:262' p='99' n='cache_extension_all_loaded' />
+<mvar f='24:264' p='156' n='sections' t='cache_extension_loaded[2]' />
+<enum i='157' f='24:196' p='99' n='cache_extension_tag' />
+<var f='24:196' p='157' n='cache_extension_tag_generator' t='var' />
+<var f='24:196' p='157' n='cache_extension_tag_glibc_hwcaps' t='var' />
+<var f='24:196' p='157' n='cache_extension_count' t='var' />
+<struct i='158' f='24:67' p='99' n='file_entry' />
+<type i='159' f='26:26' p='99' n='int32_t' />
+<mvar f='24:69' p='158' n='flags' t='int32_t' />
+<mvar f='24:70' p='158' n='key' t='uint32_t' />
+<mvar f='24:70' p='158' n='value' t='uint32_t' />
+<struct i='160' f='24:73' p='99' n='cache_file' />
+<mvar f='24:75' p='160' n='magic' t='char[11]' />
+<mvar f='24:76' p='160' n='nlibs' t='unsigned int' />
+<mvar f='24:77' p='160' n='libs' t='file_entry' />
+<struct i='161' f='24:85' p='99' n='file_entry_new' />
+<mvar f='20:0' p='161' n='' t='' />
+<mvar f='24:98' p='161' n='osversion' t='uint32_t' />
+<mvar f='24:99' p='161' n='hwcap' t='uint64_t' />
+<struct i='162' f='24:147' p='99' n='cache_file_new' />
+<mvar f='24:149' p='162' n='magic' t='char[17]' />
+<mvar f='24:150' p='162' n='version' t='char[3]' />
+<mvar f='24:151' p='162' n='nlibs' t='uint32_t' />
+<mvar f='24:152' p='162' n='len_strings' t='uint32_t' />
+<type i='163' f='25:24' p='99' n='uint8_t' />
+<mvar f='24:160' p='162' n='flags' t='uint8_t' />
+<mvar f='24:162' p='162' n='padding_unsed' t='uint8_t[3]' />
+<mvar f='24:166' p='162' n='extension_offset' t='uint32_t' />
+<mvar f='24:168' p='162' n='unused' t='uint32_t[3]' />
+<mvar f='24:170' p='162' n='libs' t='file_entry_new' />
+<struct i='164' f='27:801' p='99' n='dl_exception' />
+<mvar f='27:803' p='164' n='objname' t='char*' />
+<mvar f='27:804' p='164' n='errstring' t='char*' />
+<mvar f='27:808' p='164' n='message_buffer' t='char*' />
+<struct i='165' f='28:40' p='99' n='catch' />
+<mvar f='28:42' p='165' n='exception' t='dl_exception*' />
+<mvar f='28:43' p='165' n='errcode' t='int*' />
+<mvar f='28:44' p='165' n='env' t='jmp_buf' />
+<struct i='166' f='27:215' p='99' n='r_strlenpair' />
+<mvar f='27:217' p='166' n='str' t='char*' />
+<mvar f='27:218' p='166' n='len' t='size_t' />
+<struct i='167' f='29:63' p='99' n='copy_hwcaps' />
+<mvar f='29:65' p='167' n='next_pair' t='r_strlenpair*' />
+<mvar f='29:66' p='167' n='next_string' t='char*' />
+<struct i='168' f='30:59' p='99' n='cpu_features_basic' />
+<enum i='169' f='30:50' p='99' n='cpu_features_kind' />
+<var f='30:50' p='169' n='arch_kind_unknown' t='var' />
+<var f='30:50' p='169' n='arch_kind_intel' t='var' />
+<var f='30:50' p='169' n='arch_kind_amd' t='var' />
+<var f='30:50' p='169' n='arch_kind_zhaoxin' t='var' />
+<var f='30:50' p='169' n='arch_kind_other' t='var' />
+<mvar f='30:61' p='168' n='kind' t='cpu_features_kind' />
+<mvar f='30:62' p='168' n='max_cpuid' t='int' />
+<mvar f='30:63' p='168' n='family' t='unsigned int' />
+<mvar f='30:64' p='168' n='model' t='unsigned int' />
+<mvar f='30:65' p='168' n='stepping' t='unsigned int' />
+<struct i='170' f='30:36' p='99' n='cpuid_registers' />
+<mvar f='30:38' p='170' n='eax' t='unsigned int' />
+<mvar f='30:39' p='170' n='ebx' t='unsigned int' />
+<mvar f='30:40' p='170' n='ecx' t='unsigned int' />
+<mvar f='30:41' p='170' n='edx' t='unsigned int' />
+<struct i='171' f='30:44' p='99' n='cpuid_features' />
+<mvar f='30:46' p='171' n='cpuid' t='cpuid_registers' />
+<mvar f='30:47' p='171' n='usable' t='cpuid_registers' />
+<struct i='172' f='31:112' p='99' n='cpu_features' />
+<mvar f='31:114' p='172' n='basic' t='cpu_features_basic' />
+<mvar f='31:115' p='172' n='features' t='cpuid_features[8]' />
+<mvar f='31:116' p='172' n='preferred' t='unsigned int[1]' />
+<mvar f='31:123' p='172' n='xsave_state_size' t='long unsigned int' />
+<mvar f='31:128' p='172' n='xsave_state_full_size' t='unsigned int' />
+<mvar f='31:131' p='172' n='data_cache_size' t='long unsigned int' />
+<mvar f='31:134' p='172' n='shared_cache_size' t='long unsigned int' />
+<mvar f='31:136' p='172' n='non_temporal_threshold' t='long unsigned int' />
+<mvar f='31:138' p='172' n='rep_movsb_threshold' t='long unsigned int' />
+<mvar f='31:140' p='172' n='rep_stosb_threshold' t='long unsigned int' />
+<type i='173' f='32:42' p='99' n='cpu_set_t' />
+<type i='174' f='33:38' p='99' n='d_tag_utype' />
+<struct i='175' f='34:139' p='99' n='dl_hwcaps_priority' />
+<mvar f='34:143' p='175' n='name' t='char*' />
+<mvar f='34:144' p='175' n='name_length' t='uint32_t' />
+<mvar f='34:147' p='175' n='priority' t='uint32_t' />
+<struct i='176' f='34:43' p='99' n='dl_hwcaps_split' />
+<mvar f='34:45' p='176' n='segment' t='char*' />
+<mvar f='34:46' p='176' n='length' t='size_t' />
+<struct i='177' f='34:68' p='99' n='dl_hwcaps_split_masked' />
+<mvar f='34:70' p='177' n='split' t='dl_hwcaps_split' />
+<mvar f='34:73' p='177' n='mask' t='char*' />
+<mvar f='34:74' p='177' n='bitmask' t='uint32_t' />
+<struct i='178' f='19:223' p='99' n='libname_list' />
+<mvar f='19:225' p='178' n='name' t='char*' />
+<mvar f='19:226' p='178' n='next' t='libname_list*' />
+<mvar f='19:227' p='178' n='dont_free' t='int' />
+<struct i='179' f='22:66' p='99' n='r_scope_elem' />
+<mvar f='22:69' p='179' n='r_list' t='link_map**' />
+<mvar f='22:71' p='179' n='r_nlist' t='unsigned int' />
+<struct i='180' f='19:185' p='99' n='r_found_version' />
+<mvar f='19:187' p='180' n='name' t='char*' />
+<mvar f='19:188' p='180' n='hash' t='Elf64_Word' />
+<mvar f='19:190' p='180' n='hidden' t='int' />
+<mvar f='19:191' p='180' n='filename' t='char*' />
+<struct i='181' f='19:198' p='99' n='r_search_path_elem' />
+<mvar f='19:201' p='181' n='next' t='r_search_path_elem*' />
+<mvar f='19:204' p='181' n='what' t='char*' />
+<mvar f='19:205' p='181' n='where' t='char*' />
+<mvar f='19:209' p='181' n='dirname' t='char*' />
+<mvar f='19:210' p='181' n='dirnamelen' t='size_t' />
+<mvar f='19:212' p='181' n='status' t='r_dir_status' />
+<struct i='182' f='22:76' p='99' n='r_search_path_struct' />
+<mvar f='22:78' p='182' n='dirs' t='r_search_path_elem**' />
+<mvar f='22:79' p='182' n='malloced' t='int' />
+<struct i='183' f='22:233' p='99' n='reloc_result' />
+<mvar f='22:235' p='183' n='addr' t='Elf64_Addr' />
+<mvar f='22:236' p='183' n='bound' t='link_map*' />
+<mvar f='22:237' p='183' n='boundndx' t='unsigned int' />
+<mvar f='22:238' p='183' n='enterexit' t='uint32_t' />
+<mvar f='22:239' p='183' n='flags' t='unsigned int' />
+<mvar f='22:243' p='183' n='init' t='unsigned int' />
+<struct i='184' f='35:24' p='99' n='r_file_id' />
+<mvar f='35:26' p='184' n='dev' t='dev_t' />
+<mvar f='35:27' p='184' n='ino' t='ino64_t' />
+<struct i='185' f='22:281' p='99' n='link_map_reldeps' />
+<mvar f='22:283' p='185' n='act' t='unsigned int' />
+<mvar f='22:284' p='185' n='list' t='link_map*' />
+<struct i='186' f='36:2' p='99' n='link_map_machine' />
+<mvar f='36:4' p='186' n='plt' t='Elf64_Addr' />
+<mvar f='36:5' p='186' n='gotplt' t='Elf64_Addr' />
+<struct i='187' f='22:95' p='99' n='link_map' />
+<mvar f='22:100' p='187' n='l_addr' t='Elf64_Addr' />
+<mvar f='22:102' p='187' n='l_name' t='char*' />
+<mvar f='22:103' p='187' n='l_ld' t='Elf64_Dyn*' />
+<mvar f='22:104' p='187' n='l_next' t='link_map*' />
+<mvar f='22:104' p='187' n='l_prev' t='link_map*' />
+<mvar f='22:112' p='187' n='l_real' t='link_map*' />
+<mvar f='22:115' p='187' n='l_ns' t='Lmid_t' />
+<mvar f='22:117' p='187' n='l_libname' t='libname_list*' />
+<mvar f='22:133' p='187' n='l_info' t='Elf64_Dyn*[77]' />
+<mvar f='22:135' p='187' n='l_phdr' t='Elf64_Phdr*' />
+<mvar f='22:136' p='187' n='l_entry' t='Elf64_Addr' />
+<mvar f='22:137' p='187' n='l_phnum' t='Elf64_Half' />
+<mvar f='22:138' p='187' n='l_ldnum' t='Elf64_Half' />
+<mvar f='22:144' p='187' n='l_searchlist' t='r_scope_elem' />
+<mvar f='22:148' p='187' n='l_symbolic_searchlist' t='r_scope_elem' />
+<mvar f='22:151' p='187' n='l_loader' t='link_map*' />
+<mvar f='22:154' p='187' n='l_versions' t='r_found_version*' />
+<mvar f='22:155' p='187' n='l_nversions' t='unsigned int' />
+<mvar f='22:158' p='187' n='l_nbuckets' t='Elf_Symndx' />
+<type i='188' f='3:35' p='99' n='Elf32_Word' />
+<mvar f='22:159' p='187' n='l_gnu_bitmask_idxbits' t='Elf32_Word' />
+<mvar f='22:160' p='187' n='l_gnu_shift' t='Elf32_Word' />
+<mvar f='22:161' p='187' n='l_gnu_bitmask' t='Elf64_Addr*' />
+<mvar f='20:0' p='187' n='' t='' />
+<mvar f='20:0' p='187' n='' t='' />
+<mvar f='22:173' p='187' n='l_direct_opencount' t='unsigned int' />
+<mvar f='22:179' p='187' n='l_type' t='' />
+<mvar f='22:180' p='187' n='l_relocated' t='unsigned int' />
+<mvar f='22:181' p='187' n='l_init_called' t='unsigned int' />
+<mvar f='22:182' p='187' n='l_global' t='unsigned int' />
+<mvar f='22:183' p='187' n='l_reserved' t='unsigned int' />
+<mvar f='22:184' p='187' n='l_main_map' t='unsigned int' />
+<mvar f='22:185' p='187' n='l_visited' t='unsigned int' />
+<mvar f='22:187' p='187' n='l_map_used' t='unsigned int' />
+<mvar f='22:188' p='187' n='l_map_done' t='unsigned int' />
+<mvar f='22:189' p='187' n='l_phdr_allocated' t='unsigned int' />
+<mvar f='22:191' p='187' n='l_soname_added' t='unsigned int' />
+<mvar f='22:193' p='187' n='l_faked' t='unsigned int' />
+<mvar f='22:195' p='187' n='l_need_tls_init' t='unsigned int' />
+<mvar f='22:198' p='187' n='l_auditing' t='unsigned int' />
+<mvar f='22:199' p='187' n='l_audit_any_plt' t='unsigned int' />
+<mvar f='22:201' p='187' n='l_removed' t='unsigned int' />
+<mvar f='22:203' p='187' n='l_contiguous' t='unsigned int' />
+<mvar f='22:206' p='187' n='l_symbolic_in_local_scope' t='unsigned int' />
+<mvar f='22:210' p='187' n='l_free_initfini' t='unsigned int' />
+<mvar f='22:213' p='187' n='l_tls_in_slotinfo' t='unsigned int' />
+<mvar f='22:224' p='187' n='l_nodelete_active' t='_Bool' />
+<mvar f='22:225' p='187' n='l_nodelete_pending' t='_Bool' />
+<mvar f='37:27' p='187' n='l_cet' t='' />
+<mvar f='22:230' p='187' n='l_rpath_dirs' t='r_search_path_struct' />
+<mvar f='22:244' p='187' n='l_reloc_result' t='reloc_result*' />
+<mvar f='22:247' p='187' n='l_versyms' t='Elf64_Versym*' />
+<mvar f='22:250' p='187' n='l_origin' t='char*' />
+<mvar f='22:254' p='187' n='l_map_start' t='Elf64_Addr' />
+<mvar f='22:254' p='187' n='l_map_end' t='Elf64_Addr' />
+<mvar f='22:256' p='187' n='l_text_end' t='Elf64_Addr' />
+<mvar f='22:259' p='187' n='l_scope_mem' t='r_scope_elem*[4]' />
+<mvar f='22:261' p='187' n='l_scope_max' t='size_t' />
+<mvar f='22:264' p='187' n='l_scope' t='r_scope_elem**' />
+<mvar f='22:268' p='187' n='l_local_scope' t='r_scope_elem*[2]' />
+<mvar f='22:272' p='187' n='l_file_id' t='r_file_id' />
+<mvar f='22:275' p='187' n='l_runpath_dirs' t='r_search_path_struct' />
+<mvar f='22:278' p='187' n='l_initfini' t='link_map**' />
+<mvar f='22:285' p='187' n='l_reldeps' t='link_map_reldeps*' />
+<mvar f='22:286' p='187' n='l_reldepsmax' t='unsigned int' />
+<mvar f='22:289' p='187' n='l_used' t='unsigned int' />
+<mvar f='22:292' p='187' n='l_feature_1' t='Elf64_Word' />
+<mvar f='22:293' p='187' n='l_flags_1' t='Elf64_Word' />
+<mvar f='22:294' p='187' n='l_flags' t='Elf64_Word' />
+<mvar f='22:297' p='187' n='l_idx' t='int' />
+<mvar f='22:299' p='187' n='l_mach' t='link_map_machine' />
+<mvar f='22:307' p='187' n='l_lookup_cache' t='' />
+<mvar f='22:314' p='187' n='l_tls_initimage_size' t='size_t' />
+<mvar f='22:316' p='187' n='l_tls_blocksize' t='size_t' />
+<mvar f='22:318' p='187' n='l_tls_align' t='size_t' />
+<mvar f='22:320' p='187' n='l_tls_firstbyte_offset' t='size_t' />
+<mvar f='22:334' p='187' n='l_tls_offset' t='ptrdiff_t' />
+<mvar f='22:336' p='187' n='l_tls_modid' t='size_t' />
+<mvar f='22:341' p='187' n='l_tls_dtor_count' t='size_t' />
+<mvar f='22:345' p='187' n='l_relro_addr' t='Elf64_Addr' />
+<mvar f='22:346' p='187' n='l_relro_size' t='size_t' />
+<mvar f='22:348' p='187' n='l_serial' t='long long unsigned int' />
+<mvar f='22:356' p='187' n='l_audit' t='auditstate' />
+<struct i='189' f='38:490' p='99' n='dl_init_args' />
+<mvar f='38:492' p='189' n='new' t='link_map*' />
+<mvar f='38:493' p='189' n='argc' t='int' />
+<mvar f='38:494' p='189' n='argv' t='char**' />
+<mvar f='38:495' p='189' n='env' t='char**' />
+<struct i='190' f='21:71' p='99' n='dl_main_state' />
+<mvar f='21:73' p='190' n='audit_list' t='audit_list' />
+<mvar f='21:76' p='190' n='library_path' t='char*' />
+<mvar f='21:79' p='190' n='library_path_source' t='char*' />
+<mvar f='21:82' p='190' n='preloadlist' t='char*' />
+<mvar f='21:85' p='190' n='preloadarg' t='char*' />
+<mvar f='21:89' p='190' n='glibc_hwcaps_prepend' t='char*' />
+<mvar f='21:93' p='190' n='glibc_hwcaps_mask' t='char*' />
+<enum i='191' f='21:63' p='99' n='rtld_mode' />
+<var f='21:63' p='191' n='rtld_mode_normal' t='var' />
+<var f='21:63' p='191' n='rtld_mode_list' t='var' />
+<var f='21:63' p='191' n='rtld_mode_verify' t='var' />
+<var f='21:63' p='191' n='rtld_mode_trace' t='var' />
+<var f='21:63' p='191' n='rtld_mode_list_tunables' t='var' />
+<var f='21:63' p='191' n='rtld_mode_list_diagnostics' t='var' />
+<var f='21:63' p='191' n='rtld_mode_help' t='var' />
+<mvar f='21:95' p='190' n='mode' t='rtld_mode' />
+<mvar f='21:98' p='190' n='any_debug' t='_Bool' />
+<mvar f='21:101' p='190' n='version_info' t='_Bool' />
+<struct i='192' f='38:46' p='99' n='dl_open_args' />
+<mvar f='38:48' p='192' n='file' t='char*' />
+<mvar f='38:49' p='192' n='mode' t='int' />
+<mvar f='38:51' p='192' n='caller_dlopen' t='==============not_yet_found==========*' />
+<mvar f='38:52' p='192' n='map' t='link_map*' />
+<mvar f='38:54' p='192' n='nsid' t='Lmid_t' />
+<mvar f='38:59' p='192' n='original_global_scope_pending_adds' t='unsigned int' />
+<mvar f='38:66' p='192' n='libc_already_loaded' t='_Bool' />
+<mvar f='38:69' p='192' n='worker_continue' t='_Bool' />
+<mvar f='38:72' p='192' n='argc' t='int' />
+<mvar f='38:73' p='192' n='argv' t='char**' />
+<mvar f='38:74' p='192' n='env' t='char**' />
